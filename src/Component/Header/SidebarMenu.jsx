@@ -10,15 +10,17 @@ import { whosVisiting } from "@/Context/functions";
 import { decryptData } from "@/Context/userFunction";
 
 const SidebarMenu = ({ collapse }) => {
-  const [user, setUser] = useState("");
+
   const router = useRouter();
+  const {setToken, setUser, user} = useContext(UserContext)
 
   const handleSignOut = () => {
     try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("userAddress");
-      router.reload();
+      localStorage.removeItem("gfToken");
+      localStorage.removeItem("gfuser");
+      setUser(null);
+      setToken(null);
+      router.push('/Authentication');
     } catch (e) {
       console.error(e);
     }

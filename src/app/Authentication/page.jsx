@@ -1,8 +1,8 @@
-'use client'
+"use client";
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Authform from "@/Component/user/authform";
-import { userAPI, userlogin } from "@/Api";
+import { posterFunction, registerApi, userAPI, userlogin } from "@/Api";
 import { fetchUserDetails, logout } from "@/Redux/actions/userAuthAction";
 import Swal from "sweetalert2";
 import { usersAPi } from "@/Api";
@@ -11,8 +11,8 @@ import UserContext from "@/userContext";
 import { logo_uri } from "@/Api";
 import Loader from "@/Component/helpers/loader";
 import { useDispatch } from "react-redux";
-import { encryptData } from "@/Context/userFunction";
 import Head from "next/head";
+import { Button } from "@mui/material";
 
 const Page = () => {
   const [authType, setAuthType] = useState("SignIn");
@@ -27,54 +27,65 @@ const Page = () => {
   const [gst, setGst] = useState("");
   const [shopAddress, setShopAddress] = useState("");
 
+
   const router = useRouter();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (token !=='') {
+    console.log(token)
+    if (token) {
+      console.log('logingg')
       router.push("/");
     }
   }, [user]);
 
-
-
   const handleAuthSwitch = () => {
+    
     setAuthType(authType == "SignIn" ? "SignUp" : "SignIn");
   };
 
   const handleSubmit = async (event) => {
-   
     setLoader(true);
     const userData = {
       email,
-      password,
+      password : x,
       ...(authType === "SignUp" && {
-        userType, gst, shopAddress,
+        userType,
+        gst,
+        shopAddress,
         name,
         mobile,
         shopName,
       }),
     };
+    if(authType === "forgot"){
+      console.log("Forgot Password");
+      return
+    }
 
     if (authType === "SignIn") {
-      const formData = {email, password}; 
+
+      const formData = { email, password};
+      
+      
       try {
-        const response = await axios.get(`${userAPI}?formData=${JSON.stringify(formData)}`);
-        const { token, user } = response.data;
+        const response = await posterFunction(userlogin, formData);
+        const { token, user } = response;
+        console.log(response);
 
         setToken(token);
-          setUser(response.data.user);
-          localStorage.setItem('gfuser', JSON.stringify(response.data.user));
-          localStorage.setItem('gfToken', token);
-          router.refresh();
+        setUser(user);
+        console.log(response);
+        localStorage.setItem("gfuser", JSON.stringify(user));
+        localStorage.setItem("gfToken", token);
+        router.refresh();
         Swal.fire({
           title: "success",
           icon: "success",
           text: "Log in Successfully",
         });
-       setLoader(false);
+        setLoader(false);
         // router.push("/");
-        
       } catch (error) {
         console.error("Login error:", error);
         Swal.fire({
@@ -84,23 +95,21 @@ const Page = () => {
         });
         setLoader(false);
       }
-    } else {
+    } else if(authType==='SignUp') {
       try {
-
-        const res = await axios.post(userAPI, {formData : userData});
+        const res = await axios.post(registerApi, userData);
         if (res.status === 200) {
-          setAuthType("SignIn")
+          setAuthType("SignIn");
           Swal.fire({
             title: "Success",
             icon: "success",
             text: "Thanks for joining Grow Food",
-            confirmButtonText : "OK", 
-          }).then(async(result)=>{
-            if(result.isConfirmed && authType==='SignIn'){
+            confirmButtonText: "OK",
+          }).then(async (result) => {
+            if (result.isConfirmed && authType === "SignIn") {
               await handleSubmit();
             }
           });
-          
 
           setLoader(false);
         }
@@ -116,18 +125,20 @@ const Page = () => {
     }
   };
 
- 
-
   return (
     <>
-    <Head>
-          <title>The Grow Food</title>
-          <meta name="description" content="The Grow Food Is B2B solution for Restaurants" />
-          <meta name="keywords" content=" Rastaurants, Hotels, Foods, B2B" />
-        </Head>
+      <Head>
+        <title>The Grow Food</title>
+        <meta
+          name="description"
+          content="The Grow Food Is B2B solution for Restaurants"
+        />
+        <meta name="keywords" content=" Rastaurants, Hotels, Foods, B2B" />
+      </Head>
       {loader ? (
         <Loader />
       ) : (
+        <>
         <div className="mt-8">
           <div className="flex flex-col justify-center items-center">
             <img
@@ -159,7 +170,6 @@ const Page = () => {
             shopAddress={shopAddress}
             setShopAddress={setShopAddress}
             setUserType={setUserType}
-      
           />
           {user?.user && (
             <div className="mt-8 text-white">
@@ -171,15 +181,13 @@ const Page = () => {
               <button onClick={() => dispatch(logout())}>Sign Out</button>
             </div>
           )}
-          {/* <Dialog open={open}>
-          <Notifier 
-          open={open!==""}
-          setOpen={setOpen}  
-          message={message}
-          />
-
-      </Dialog> */}
+          
+          
         </div>
+        <div>
+          <Button onClick={()=>setAuthType('forgot')}>Forgot Password</Button>
+        </div>
+        </>
       )}
     </>
   );

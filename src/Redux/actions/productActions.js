@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { categoryApi, getBrandsApi, getCategoriesApi, getSubCategoriesApi, getSubCategoriesAPI, getUnitApi, productsAPi } from '@/Api';
+import { categoryApi, getBrandsApi, getBrandsProductApi, getCategoriesApi, getCategoriesProductApi, getSubCategoriesApi, getSubCategoriesAPI, getUnitApi, productsAPi } from '@/Api';
 export const GET_PRODUCTS = 'GET_PRODUCTS';
 export const ADD_PRODUCT = 'ADD_PRODUCT';
 export const GET_PRODUCT = 'GET_PRODUCT';
@@ -9,6 +9,9 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const DELETE_PRODUCT = 'DELETE_PRODUCT';
 export const GET_UNIT = 'GET_UNIT';
 export const GET_SUBCATEGORY = 'GET_SUBCATEGORY';
+export const GET_CATEGORY_PRODUCT = 'GET_CATEGORY_PRODUCT';
+export const GET_BRANDS_PRODUCT = 'GET_BRANDS_PRODUCT';
+
 
 
 // Use the correct URL for React Native emulator
@@ -32,6 +35,24 @@ export const getProduct = (id) => async (dispatch) => {
     console.error('Error fetching product:', error);
   }
 };
+
+export const getBrandsProduct = (brand)=> async(dispatch)=>{
+  try{
+    const res = await axios.get(`${getBrandsProductApi}${brand}`)
+    dispatch({type : 'GET_BRANDS_PRODUCT', payload: res.data});
+  }catch(err){
+    console.error('Error fetching brands product', err);
+  }
+}
+
+export const getCategoriesProduct = (categories)=> async(dispatch)=>{
+  try{
+    const res = await axios.get(`${getCategoriesProductApi}${categories}`)
+    dispatch({type : 'GET_CATEGORY_PRODUCT', payload: res.data});
+  }catch(err){
+    console.error('Error fetching brands product', err);
+  }
+}
 
 
 // Getting Brands 
@@ -61,7 +82,7 @@ export const getCategories = () => async dispatch => {
 export const getUnit = ()=>async dispatch =>{
   try{
     const res = await axios.get(getUnitApi);
-    dispatch({type : GET_UNIT, payload: res.data});
+    dispatch({type : GET_UNIT, payload: res.data.data});
   }catch(err){
     console.error('Error fetching unit', err);
   };

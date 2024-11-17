@@ -9,43 +9,37 @@ import {
   FaRegBell,
 } from "react-icons/fa";
 import Link from "next/link";
-import Logo from "@/assets/logo.png";
+
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { MdAdminPanelSettings } from "react-icons/md";
-import { useSelector, useDispatch } from "react-redux";
+
 import { MdMenu } from "react-icons/md";
-import { Button, Dialog, Drawer } from "@mui/material";
+import { Drawer } from "@mui/material";
 import { SiIfood } from "react-icons/si";
 import Profile from "../user/profile";
 import UserContext from "@/userContext";
-import { CiMenuKebab, CiSettings } from "react-icons/ci";
-import { FaDatabase } from "react-icons/fa";
-import { memoize } from "@/Context/productFunction";
-import { getProducts } from "@/Context/productFunction";
+
 import { GrUserAdmin } from "react-icons/gr";
-import { fetchUserDetails } from "@/Context/userFunction";
-import SidebarMenu from "./SidebarMenu";
+
 import { sideBarData } from "@/constants";
-const Header = ({ setCollapse, collapse }) => {
-  const dispatch = useDispatch();
+const Header = () => {
   const router = useRouter();
 
-  const { user, token } = useContext(UserContext);
+  const { user, token, setUser, setToken } = useContext(UserContext);
 
   const [showProfile, setShowProfile] = useState(false);
-  const [bell, setBell] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+
   const [open, setOpen] = useState(false);
-  const [products, setProducts] = useState([]);
+
   const [showDashboard, setShowDashboard] = useState(false);
 
   const userDetails = user;
 
   useEffect(() => {
     if (user) {
-      if (user?.userType === "Admin" || user?.userType == "Vendor") {
+      if (user.userType === "admin" || user.userType == "Vendor") {
         setShowDashboard(true);
       }
     }
@@ -54,26 +48,19 @@ const Header = ({ setCollapse, collapse }) => {
   const handleSignOut = () => {
     try {
       localStorage.removeItem("gfToken");
-      localStorage.removeItem("gfUser");
-      router.reload();
+      localStorage.removeItem("gfuser");
+      setUser(null);
+      setToken(null);
+      router.push("/Authentication");
     } catch (e) {
       console.error(e);
     }
   };
 
-  const isUserLoggedIn = () => {
-    const token = localStorage.getItem("gfToken");
-    if (token) {
-      return true;
-    }
-  };
-
-
-
   return (
     <>
       <div className="bg-color-1 1e4426] text-white top-0 fixed z-[500] w-full">
-        <div className="flex justify-between items-center px-4 text-sm">
+        <div className="flex  items-center px-4 text-sm">
           <div className="flex justify-start items-center w-full">
             <div className=" flex justify-start gap-2 items-center">
               <MdMenu
@@ -83,7 +70,7 @@ const Header = ({ setCollapse, collapse }) => {
 
               <Link href="/">
                 <Image
-                  src='/favicon.ico'
+                  src="/favicon.ico"
                   width={50}
                   height={50}
                   className=" w-12 h-12 rounded-full p-1"
@@ -91,12 +78,12 @@ const Header = ({ setCollapse, collapse }) => {
                 />
               </Link>
             </div>
-            <div className="md:w-[30%] w-[80%] md:ml-16 ml-2">
-              <Search products={products} />
+            <div className="md:w-[70%] w-[80%] md:ml-16 ml-2">
+              <Search />
             </div>
           </div>
 
-          <div className="md:flex hidden gap-2">
+          <div className="md:flex hidden gap-2 w-[50%]">
             <div className="flex justify-between items-center gap-4 w-full mr-40">
               {sideBarData.map((item, index) => (
                 <>
@@ -116,59 +103,58 @@ const Header = ({ setCollapse, collapse }) => {
                   Log in
                 </Link>
               ) : (
-                <button
-                  onClick={handleSignOut}
-                  className="bg-gray-100 text-[#15892e] w-20 rounded-md hover:bg-black hover:text-white text-center p-1"
-                  href="Authentication"
-                >
-                  {" "}
-                  Log out
-                </button>
+                <>
+                  {showDashboard && (
+                    <button
+                      onClick={() => router.push("/admin/Dashboard")}
+                      className="bg-gray-100 text-[#15892e] w-20 rounded-md hover:bg-black hover:text-white text-center p-1"
+                      href="Authentication"
+                    >
+                      {" "}
+                      Dashboard
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleSignOut}
+                    className="bg-gray-100 text-[#15892e] w-20 rounded-md hover:bg-black hover:text-white text-center p-1"
+                    href="Authentication"
+                  >
+                    {" "}
+                    Log out
+                  </button>
+                
+                </>
               )}
-              {showDashboard && (
-                <button
-                  onClick={() => router.push("/admin/dashboard")}
-                  className="bg-gray-100 text-[#15892e] w-20 rounded-md hover:bg-black hover:text-white text-center p-1"
-                  href="Authentication"
-                >
-                  {" "}
-                  Dashboard
-                </button>
-              )}
-            </div>
-            <span className="flex bg-color-1 h-8 w-8 rounded-md">
-              <FaRegBell className="w-5 h-5 mt-2 ml-2" />
-              {/* <span className="rounded-full -translate-y-2 -translate-x-1 text-lg font-semibold">{user?.cartLength}</span> */}
-            </span>
-            {token && (
+                {token && (
               <img
-                src={
-                  userDetails?.user?.image ??
-                  "/favicon.ico"
-                }
+                src={userDetails?.user?.image ?? "/favicon.ico"}
                 className="w-8 h-8 hover:cursor-pointer rounded-full mr-4"
                 onClick={() => setShowProfile(true)}
               />
             )}
+            </div>
+
+            
           </div>
         </div>
       </div>
 
       <Drawer open={open} onClose={() => setOpen(false)}>
-        <div className="bg-[#1e4426] text-white h-full flex flex-col ">
+        <div className="bg-gray-100 h-full flex flex-col ">
           <div className="flex flex-col justify-center items-center mt-8 font-semibold">
             <SiIfood className="text-7xl" />
             <span className="text-lg">
-              Grow <span className="text-green-400">Food</span>
+              Grow <span className="text-[#15892e]">Food</span>
             </span>
             <div className="flex flex-col gap-5 w-full mt-10">
               <Link
                 href="/"
                 onClick={() => setOpen(false)}
-                className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%]"
+                className="flex gap-2 hover:bg-gray-300 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%]"
               >
                 <span>
-                  <FaHome className="mt-1 text-yellow-500" />
+                  <FaHome className="mt-1 text-[#15892e]" />
                 </span>
                 <span>Home</span>
               </Link>
@@ -178,7 +164,7 @@ const Header = ({ setCollapse, collapse }) => {
                 className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%]"
               >
                 <span>
-                  <FaCartPlus className="mt-1 text-yellow-500" />
+                  <FaCartPlus className="mt-1 text-[#15892e]" />
                 </span>
                 <span>Products</span>
               </Link>
@@ -188,7 +174,7 @@ const Header = ({ setCollapse, collapse }) => {
                 className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%]"
               >
                 <span>
-                  <FaCartPlus className="mt-1 text-yellow-500" />
+                  <FaCartPlus className="mt-1 text-[#15892e]" />
                 </span>
                 <span>Cart</span>
               </Link>
@@ -198,13 +184,13 @@ const Header = ({ setCollapse, collapse }) => {
                   className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%] "
                 >
                   <span onClick={() => setUserMenu(false)}>
-                    <FaLockOpen className="mt-1 text-yellow-500" />
+                    <FaLockOpen className="mt-1 text-[#15892e]" />
                   </span>
                   <span>Log out</span>
                 </button>
               ) : (
                 <Link
-                  href="/auth"
+                  href="/Authentication"
                   onClick={() => setOpen(false)}
                   className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%] "
                 >
@@ -223,7 +209,7 @@ const Header = ({ setCollapse, collapse }) => {
                     setOpen(false);
                   }}
                 >
-                  <span className="mt-1 text-yellow-600">
+                  <span className="mt-1 text-[#15892e]">
                     <MdAdminPanelSettings />
                   </span>
                   <span>Profile</span>
@@ -234,7 +220,7 @@ const Header = ({ setCollapse, collapse }) => {
                   className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%] "
                   onClick={() => router.push("/admin/Dashboard")}
                 >
-                  <span className="mt-1 text-yellow-600">
+                  <span className="mt-1 text-[#15892e]">
                     <GrUserAdmin />
                   </span>
                   <span>Dashboard</span>

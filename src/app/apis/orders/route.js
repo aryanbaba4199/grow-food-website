@@ -1,24 +1,43 @@
 import connectDb from "@/app/lib/db";
 import Order from "@/models/orders/orders";
 import { sendResponse } from "../userAddress/route";
+import Product from "@/models/products/Product";
 
 connectDb();
 
-export async function POST(req){
+export async function POST(req) {
     const formData = await req.json();
-    console.log(formData);
-    try{
+    console.log("Received orders:", formData);
+    
+    try {
         const orders = formData;
-        const savedOrders = await Promise.all(orders.map(async(orderDetails) => {
-            const newOrder = new Order(orderDetails)
-            return await newOrder.save();
-        }))
+        const savedOrders = await Promise.all(orders.map(async (orderDetails) => {
+            const product = await Product.findOne({ _id: orderDetails.productId });
+            console.log("Retrieved product:", product);
+            
+            if (product) {
+                orderDetails.vendorId = product.vendorId;
+                console.log("Vendor ID set:", orderDetails.vendorId);
+            } else {
+                throw new Error(`Product not found for ID: ${orderDetails.productId}`);
+            }
+
+            const newOrder = new Order(orderDetails);
+            console.log("Order before saving:", newOrder);
+            
+            const savedOrder = await newOrder.save();
+            console.log("Saved Order:", savedOrder);
+            return savedOrder; // Return saved order for potential further processing
+        }));
+
         return sendResponse('success', 200);
-    }catch(e){
+    } catch (e) {
         console.error(e);
         return sendResponse(e.message, 500);
-    };
+    }
 }
+
+
 
 export async function GET(req){
     const {searchParams} = new URL(req.url);

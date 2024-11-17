@@ -18,7 +18,7 @@ import Link from "next/link";
 const Page = () => {
   const { user } = useContext(UserContext);
   const [userAddress, setUserAddress] = useState([]);
-  const [Page, setPage] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [orderIds, setPageIds] = useState([]);
   const [loader, setLoader] = useState(false);
 
@@ -59,11 +59,10 @@ const Page = () => {
   const getPage = async (id) => {
     setLoader(true);
     try {
-      const res = await axios.get(`${getOrdersByUser}${id}`);
+      const res = await axios.get(`${getOrdersByUser}/${id}`);
       if (res.status === 200) {
-        setPageIds(res.data.data);
-        const productIds = res.data.data.map((item) => item.productId);
-
+        setPageIds(res.data);
+        const productIds = res.data.map((item) => item.productId);
         getProductsfromId(productIds);
       }
     } catch (e) {
@@ -80,7 +79,7 @@ const Page = () => {
         productIds.map(async (id) => {
           try {
             console.log('getting product by id', id)
-            const res = await axios.get(`${getProductbyId}${id}`);
+            const res = await axios.get(`${getProductbyId}/${id}`);
             return res.data;
           } catch (e) {
             console.error(e);
@@ -88,13 +87,15 @@ const Page = () => {
         })
       );
 
-      setPage(productDetails || []); // Ensure Page is always an array
+      setOrders(productDetails || []); // Ensure Page is always an array
     } catch (e) {
       console.error(e);
     } finally {
       setLoader(false);
     }
   };
+
+  console.log('page jave', orders)
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -111,7 +112,7 @@ const Page = () => {
         const deleteOrder = async () => {
           setLoader(true);
           try {
-            const res = await axios.delete(`${deleteOrderbyId}${id}`);
+            const res = await axios.delete(`${deleteOrderbyId}/${id}`);
             if (res.status === 200) {
               Swal.fire({
                 title: "Cancelled",
@@ -154,14 +155,14 @@ const Page = () => {
                 Your Orders
               </span>
             </div>
-            {orderIds.length===0 && <>
+            {!orderIds && <>
             <div className="flex flex-col justify-center items-center h-screen">
               <Typography>You did not make any orders yet</Typography>
               <Link href='/Products' className="bg-[#15892e] text-white p-2 px-4 rounded-md mt-8">Lets Make a Order</Link>
             </div>
             
             </>}
-            {orderIds.length && orderIds?.map((item, index) => (
+            {orderIds && orderIds?.map((item, index) => (
               <div
                 key={index}
                 onClick={() => {
@@ -183,7 +184,7 @@ const Page = () => {
               >
                 <div className="flex-1 flex justify-evenly items-center">
                   <img
-                    src={Page[index]?.image}
+                    src={orders[index]?.image[index]}
                     alt="Grow Food"
                     className="w-24 h-24 rounded-md"
                   />
@@ -191,10 +192,10 @@ const Page = () => {
                     <span className="bg-color-1 px-2 text-green-700 font-semibold rounded-sm w-full">
                       Product Details
                     </span>
-                    <span>{Page[index]?.name}</span>
-                    <span>{Page[index]?.categories}</span>
-                    <span>Price : {Page[index]?.price}/-</span>
-                    <span>Discount : {Page[index]?.discount}%</span>
+                    <span>{orders[index]?.name}</span>
+                    <span>{orders[index]?.categories}</span>
+                    <span>Price : {orders[index]?.price}/-</span>
+                    <span>Discount : {orders[index]?.discount}%</span>
                   </div>
                 </div>
                 <div className="flex-1">

@@ -1,6 +1,8 @@
 import Product from "@/models/products/Product";
 import connectDb from "@/app/lib/db";
 
+
+
 connectDb(); // Removed 'await' since it should be executed synchronously here.
 
 // GET method

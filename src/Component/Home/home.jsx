@@ -72,6 +72,7 @@ const Home = () => {
             <Slide
               products={brands}
               title="Shop By Brand"
+              path = 'brands'
               timer={24}
               filter={handleBrandFilter}
             />

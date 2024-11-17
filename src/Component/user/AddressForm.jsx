@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, TextField, Typography } from '@mui/material'
 import axios from 'axios'
-import { API_URL, createAddress } from '@/Api'
+import { API_URL, createAddress, posterFunction } from '@/Api'
 import Swal from 'sweetalert2'
 import UserContext from '@/userContext'
 
@@ -39,8 +39,8 @@ const AddressForm = ({setAddressMode, fetchAddress}) => {
 
   const handleSubmit = async()=>{
     try{
-      const res = await axios.post(createAddress, formData); 
-      if(res.status === 200){
+      const res = await posterFunction(createAddress, formData); 
+      if(res){
         setAddressMode(false);
         Swal.fire({
           icon: 'success',

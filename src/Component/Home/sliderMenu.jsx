@@ -4,9 +4,10 @@ import "react-multi-carousel/lib/styles.css";
 import Countdown from "react-countdown";
 import { useRouter } from "next/navigation";
 
+
 import { IoIosArrowForward } from "react-icons/io";
 
-const Slide = ({ products, title, timer, filter }) => {
+const Slide = ({ products, title, timer, path }) => {
 
   const router = useRouter();
 
@@ -72,7 +73,7 @@ const Slide = ({ products, title, timer, filter }) => {
           <div
             className="flex border-2 mt-2 ml-2 mb-1 p-2 rounded-sm  flex-col justify-center items-center hover:cursor-pointer"
             key={index}
-            onClick={() => filter(product.name)}
+            onClick={()=>router.push(`/products?${path}=${product.name}`)}
           >
             <img
               src={

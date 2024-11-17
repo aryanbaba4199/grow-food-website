@@ -1,58 +1,71 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
-import { Autocomplete, TextField, InputAdornment, Dialog } from "@mui/material";
+import { Autocomplete, TextField, InputAdornment } from "@mui/material";
 import { useRouter } from "next/navigation";
-import CryptoJS from "crypto-js";
-import UserContext from "@/userContext";
-import ProductDetails from "../product/Details";
-import { decryptData } from "@/Context/userFunction";
+import axios from "axios";
+import { getterFunction } from "@/Api";
 
 const Search = () => {
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [open, setOpen] = useState(false);
-  const { searchInput, setSearchInput } = useContext(UserContext);
+  const [query, setQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState(null);
   const router = useRouter();
 
-  // Fetch and filter products whenever searchInput changes
-  useEffect(() => {
-    const storedProducts = localStorage.getItem("products");
-    if (storedProducts) {
-      const decryptedProducts = decryptData(storedProducts);
-      if (decryptedProducts) {
-        const options = decryptedProducts.filter((item) =>
-          item.name.toLowerCase().includes(searchInput.toLowerCase())
-        );
-        setFilteredProducts(options);
-      }
+  // Fetch products based on the search input
+  const fetchProducts = async (searchTerm) => {
+    try {
+      const response = await getterFunction(
+        `/api/helpers/search?query=${searchTerm}`
+      );
+      setFilteredProducts(response.data); // Set search suggestions
+    } catch (error) {
+      console.error("Error fetching products:", error);
     }
-  }, [searchInput]);
-
-  // Handle search input change
-  const handleInputChange = (event, value) => {
-    setSearchInput(value);
   };
 
-  // Handle product selection
+  const handleInputChange = (event, value) => {
+    setQuery(value);
+    if (value.trim()) fetchProducts(value); // Fetch products as user types
+  };
+
+  const handleSearchSubmit = () => {
+    if (query.trim() && selectedProductId) {
+      router.push(`/Productdetails?product=${selectedProductId}`); // Redirect with productId
+    }
+  };
+
   const handleProductSelect = (event, value) => {
-    setSearchInput(value);
-    router.push("/ProductDetails")
+    const selectedProduct = filteredProducts.find(
+      (product) => product.name === value
+    );
+    if (selectedProduct) {
+      setSelectedProductId(selectedProduct._id); // Store the selected product's ID
+      router.push(`/ProductDetails?product=${selectedProduct._id}`);
+    }
   };
 
   return (
-    <>
+    <div className="flex items-center w-full max-w-md mx-auto relative">
       <Autocomplete
         freeSolo
         id="product-search"
         disableClearable
-        options={filteredProducts.map((option) => option.name)}
+        options={filteredProducts.map((option) => option.name)} // Options for autocomplete
+        onInputChange={handleInputChange}
+        onChange={handleProductSelect}
         renderInput={(params) => (
           <TextField
             {...params}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSearchSubmit(); // Trigger search on Enter key
+              }
+            }}
             InputProps={{
               ...params.InputProps,
               type: "search",
-              placeholder: "Search",
+              placeholder: "Search for products, brands, and more",
               startAdornment: (
                 <InputAdornment position="start">
                   <FaSearch style={{ color: "#1e4426", marginLeft: 8 }} />
@@ -62,18 +75,21 @@ const Search = () => {
                 backgroundColor: "#f3f4f6",
                 color: "black",
                 padding: 0,
+                borderRadius: "4px",
+                paddingLeft: "8px",
+                paddingRight: "8px",
               },
             }}
           />
         )}
-        onInputChange={handleInputChange} // Update search query in input change
-        onChange={handleProductSelect} // Handle product selection
+        sx={{
+          width: "100%",
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "24px", // Rounded search box style
+          },
+        }}
       />
-
-      <Dialog open={open} fullScreen onClose={() => setOpen(false)}>
-        <ProductDetails product={selectedProduct} setOpen={setOpen} />
-      </Dialog>
-    </>
+    </div>
   );
 };
 

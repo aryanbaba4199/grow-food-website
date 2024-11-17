@@ -1,43 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { API_URL } from "@/Api";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Grid,
-} from "@mui/material";
+import { API_URL, updateProductsApi, updaterFunction } from "@/Api";
+import { Button, TextField, Grid, Typography } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { AiOutlineUpload } from "react-icons/ai"; // Import an icon for image upload
 
-const EditProducts = ({ open, onClose, product, setEditMode, setOpen }) => {
+const EditProducts = ({ product, setEditMode }) => {
   const [formData, setFormData] = useState({ ...product });
-  const [display, setDisplay] = useState(false);
+  const [imageFiles, setImageFiles] = useState([]);
 
   useEffect(() => {
-    setFormData({ ...product });
-    setDisplay(product.display ?? true);
+    // Initialize imageFiles with the product's images
+    if (product.image) {
+      setImageFiles(product.image);
+    }
   }, [product]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+
+  const handleImageUpload = ()=>{
+
+  }
+
   const handleSave = async () => {
     try {
-      const res = await axios.put(`${API_URL}/api/products/updateProduct`, {
-        formData,
-      });
-      if (res.status === 200) {
+      const res = await updaterFunction(`${updateProductsApi}`, formData)
+      
         Swal.fire({
           title: "Success",
           icon: "success",
           text: "Product updated successfully",
         });
-        setOpen(false);
-      }
+        setEditMode(null);
+
     } catch (err) {
       Swal.fire({
         title: "Error",
@@ -48,10 +46,8 @@ const EditProducts = ({ open, onClose, product, setEditMode, setOpen }) => {
     }
   };
 
-  console.log(display, formData.display);
-
   const inputFields = Object.keys(formData)
-    .filter((key) => key !== "_id" && key !== "__v")
+    .filter((key) => key !== "_id" && key !== "__v" && key !== "image") // Exclude _id, __v, and image
     .map((key) => (
       <Grid item xs={12} key={key}>
         <TextField
@@ -60,63 +56,54 @@ const EditProducts = ({ open, onClose, product, setEditMode, setOpen }) => {
           name={key}
           value={formData[key]}
           onChange={handleChange}
-          disabled={key === "sellingPrice"}
+        
           margin="normal"
         />
       </Grid>
     ));
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <div className="px-8 p-2">
       <div className="flex justify-between w-full items-center">
-        <DialogTitle>Edit Product</DialogTitle>
+        <Typography fontSize={22}>Edit Product</Typography>
+      </div>
 
-        <div className="flex justify-start items-center w-full">
-          <div
-            className={`${
-              display ? "bg-color-1 justify-end" : "bg-red-600 justify-start"
-            } h-8 w-24 rounded-3xl flex  items-center ease-in-out  `}
-          >
-            {display && (
-              <span className="text-white text-sm pr-1">Showing</span>
-            )}
-            <div
-              className="w-7 h-7 shadow-md shadow-black rounded-full bg-purple-600 flex ease-in-out"
-              onClick={() => {
-                setDisplay(true ? false : true);
-                setFormData({
-                  ...formData,
-                  display: display === true ? false : true,
-                });
-              }}
-            ></div>
-            {!display && (
-              <span className="text-white text-sm pl-1">Hidden</span>
-            )}
-          </div>
+      <Grid container spacing={2}>
+        {inputFields}
+      </Grid>
+
+      {/* Display images with upload option */}
+      <div className="mt-4">
+        <Typography variant="h6">Images</Typography>
+        <div className="flex gap-2 mt-2">
+          {imageFiles.map((imageUrl, index) => (
+            <div key={index} className="relative">
+              <img src={imageUrl} alt={`Product Image ${index + 1}`} className="h-24 w-24 object-cover" />
+              <AiOutlineUpload 
+                className="absolute top-0 right-0 text-xl cursor-pointer"
+                onClick={() => document.getElementById(`file-input-${index}`).click()} // Trigger file input
+              />
+              <input 
+                type="file" 
+                id={`file-input-${index}`} 
+                accept="image/*" 
+                style={{ display: "none" }} 
+                onChange={handleImageUpload}
+              />
+            </div>
+          ))}
         </div>
       </div>
 
-      <DialogContent>
-        <Grid container spacing={2}>
-          {inputFields}
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={() => {
-            setEditMode(false);
-            setOpen(false);
-          }}
-          color="secondary"
-        >
+      <div className="flex justify-end mt-4">
+        <Button onClick={() => setEditMode(false)} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary">
+        <Button onClick={handleSave} color="primary" style={{ marginLeft: '8px' }}>
           Save
         </Button>
-      </DialogActions>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 

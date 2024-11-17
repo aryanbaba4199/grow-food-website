@@ -13,7 +13,7 @@ import { getSubCategories, getUnit } from "@/Redux/actions/productActions"; // A
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import { Autocomplete, Box, Typography, Grid, IconButton } from "@mui/material";
+import { Autocomplete, Box, Typography, Grid, IconButton, Card } from "@mui/material";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import { unitMeasureData } from "@/Context/projectData";
@@ -88,6 +88,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
 
 
   const handleFileUpload = (event) => {
+    setLoader(true);
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -101,6 +102,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
       };
       reader.readAsArrayBuffer(file);
     }
+    setLoader(false);
   };
 
   
@@ -123,9 +125,8 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
       // console.log(description);
       return {
         ...product, 
-        vendorId : user?.userId ?? 0, 
+        vendorId : user._id ?? 0, 
         image : imageArray,
-        price : 0,
         // description: description || "No description available"
       }
     })
@@ -192,6 +193,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
 
 
   const handleSubmit = async () => {
+    setProductData({...productData, vendorId : user._id})
     setLoader(true);
     try {
       const response = await axios.post(createProduct, productData, {});
@@ -258,6 +260,10 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
   };
 
   const handleUploadImage = async () => {
+    if(productData.image.length > 0) {
+      return;
+    }
+  
     if (image.length === 0) {
       Swal.fire({
         title: "Please Select Images",
@@ -265,6 +271,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
       });
       return;
     }
+      setLoader(true);
 
     try {
       const uploadedImages = await Promise.all(
@@ -286,17 +293,19 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
       setProductData((prevProductData) => ({
         ...prevProductData,
         image: imageUrls,
-        vendorId: user?.userId,
+        vendorId: user?._id,
       }));
       setImageId(imageIds);
     } catch (e) {
       console.error(e);
+      setLoader(false)
       Swal.fire({
         title: "Error uploading images",
         icon: "error",
         text: "An error occurred while uploading images.",
       });
     }
+    setLoader(false)
   };
 
   // Remove useEffect since it's no longer needed
@@ -830,11 +839,13 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
           </div>
         </Box>
       )}
-      <div>
-      <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-      <Button onClick={handleBulkSubmit} disabled={loader}>
-        {loader ? "Uploading..." : "Upload Bulk Products"}
+      <div className="mt-4 px-8 flex justify-center items-center">
+        <Card elevation={3} className="px-8 p-4 mb-2">
+      <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload}/>
+      <Button variant="contained" color="success" onClick={handleBulkSubmit} disabled={loader}>
+        {bulkProducts.length>0 ? "Upload Bulk Products" :  "Upload Bulk Products"}
       </Button>
+      </Card>
     </div>
     </>
   );

@@ -14,17 +14,17 @@ export const sideBarData = [
     {
         icon : <FaDatabase/>, 
         name : "Products", 
-        path : "/Products" 
+        path : "/products" 
     },
     {
         icon : <FaCartPlus/>,
         name : "Cart", 
-        path : "/Cart" , 
+        path : "/cart" , 
     },
     {
         icon : <SiGooglecontaineroptimizedos/>, 
         name : "Orders", 
-        path : "/Orders", 
+        path : "/orders", 
     },
     
 

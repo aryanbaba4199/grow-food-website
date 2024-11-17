@@ -11,16 +11,13 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  Dialog,
 } from "@mui/material";
-import { IoIosCreate } from "react-icons/io";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { IoMdCloseCircle } from "react-icons/io";
 import axios from "axios";
 import { FaCheckDouble } from "react-icons/fa";
 import { decryptData } from "@/Context/userFunction";
-import AddressForm from "../user/AddressForm";
 
 const Checkout = ({
   products,
@@ -33,27 +30,23 @@ const Checkout = ({
   const [calculatedPrices, setCalculatedPrices] = useState([]);
   const router = useRouter();
   const { user } = useContext(UserContext);
-  const [addressMode, setAdddremode] = useState(false);
 
   useEffect(() => {
-    
-    fetchAddress();
-  }, [addressMode]);
-
-  const fetchAddress = async () => { 
-    try {
-      const res = await axios.get(
-        `${getuserAddress}?id=${user?._id}`
-      );
-      if (res.status === 200) {
-        setAddress(res.data.data);
+    const fetchAddress = async () => {
+      try {
+        const res = await axios.get(`${getuserAddress}/${user._id}`);
+        if (res.status === 200) {
+          setAddress(res.data);
+        }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    };
+    fetchAddress();
+  }, []);
 
   useEffect(() => {
+    console.log('length : ', qty)
     if (products.length > 0 && qty.length > 0) {
       const newCalculatedPrices = products.map((item, index) => {
         const quantity = qty[index]; // Corresponding quantity for the product
@@ -65,9 +58,6 @@ const Checkout = ({
     }
   }, [products, qty]);
 
-
- 
-
   const handleCheckOut = async () => {
     if (!addressId) {
       Swal.fire({
@@ -77,9 +67,8 @@ const Checkout = ({
       });
       return;
     }
-    console.log("Addresseid", addressId);
 
-    const formData = calculatedPrices.map((item, index) => ({
+    const orderDetails = calculatedPrices.map((item) => ({
       productId: item.productId,
       vendorId: products.find((pr) => pr._id === item.productId)?.vendorId,
       userId: user._id,
@@ -88,12 +77,11 @@ const Checkout = ({
       paymentId: "na",
       paymentMode: "COD",
       orderAmount: item.totalPrice,
-      quantity: qty[index],
     }));
-
+    console.log(orderDetails)
 
     try {
-      const res = await axios.post(createOrderAPI, formData);
+      const res = await axios.post(createOrderAPI, {formData : orderDetails});
       if (res.status === 200) {
         Swal.fire("Success", "Order Created Successfully", "success");
 
@@ -129,6 +117,9 @@ const Checkout = ({
       }
     }
   };
+
+  console.log('product is ', products)
+  console.log('cal is ', calculatedPrices)
 
   return (
     <>
@@ -176,17 +167,8 @@ const Checkout = ({
                       </div>
                     ))
                   ) : (
-                    <Typography>Address not found</Typography>
-
+                    <Typography>Loading address...</Typography>
                   )}
-                </div>
-                <div className="flex justify-end items-center">
-                  <Button onClick={()=>setAdddremode(!addressMode)} variant="outlined">
-                  <IoIosCreate className="mr-2 text-xl"/>
-                <Typography>
-                  Create Address
-                </Typography>
-                </Button>
                 </div>
               </CardContent>
             </Card>
@@ -251,9 +233,6 @@ const Checkout = ({
           </button>
         </div>
       </div>
-      <Dialog open={addressMode} onClose={()=>setAdddremode(false)}>
-          <AddressForm setAddressMode={setAdddremode} />
-      </Dialog>
     </>
   );
 };

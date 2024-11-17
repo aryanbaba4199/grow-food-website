@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 const productSchema = mongoose.Schema({
+    hsn : {
+        type : String,
+    },
     vendorId : {
         type : String,
         required : true,
@@ -41,7 +44,7 @@ const productSchema = mongoose.Schema({
     
     price : {
         type : Number,
-        required: true,
+   
     },
     sellingPrice : {
         type : Number,

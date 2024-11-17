@@ -1,4 +1,6 @@
-import { GET_PRODUCTS, GET_SUBCATEGORY, ADD_PRODUCT, GET_BRANDS, GET_CATEGORY, GET_PRODUCT, GET_UNIT } from '../actions/productActions';
+import { GET_PRODUCTS, GET_SUBCATEGORY, ADD_PRODUCT, GET_BRANDS, GET_CATEGORY, GET_PRODUCT, GET_UNIT,
+  GET_BRANDS_PRODUCT, GET_CATEGORY_PRODUCT
+ } from '../actions/productActions';
 
 const initialState = {
   products: [],
@@ -23,6 +25,10 @@ const productReducer = (state = initialState, action) => {
       return { ...state, categories: action.payload };
     case GET_UNIT:
       return { ...state, units: action.payload };  
+    case GET_BRANDS_PRODUCT:
+      return { ...state, brandsProduct: action.payload };
+    case GET_CATEGORY_PRODUCT:
+      return { ...state, categoryProduct: action.payload };
     default:
       return state;
   }

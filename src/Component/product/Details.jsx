@@ -19,7 +19,7 @@ import UserContext from "@/userContext";
 import Checkout from "../checkout/checkout";
 import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
 import axios from "axios";
-import { cartApi } from "@/Api";
+import { cartApi, createCartApi } from "@/Api";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import Carousel from "react-multi-carousel";
@@ -86,12 +86,12 @@ const Details = ({ productData }) => {
     if (token !== "") {
       const formData = {
         userId: user._id,
-        productId: product?._id,
+        productId: product._id,
         qty: qty,
       };
       console.log(formData);
       try {
-        const res = await axios.post(`${cartApi}`, { formData });
+        const res = await axios.post(createCartApi, formData);
         if (res.status === 200) {
           Swal.fire({
             title: "Success",
@@ -145,7 +145,7 @@ const Details = ({ productData }) => {
   };
 
   const handleDecrement = () => {
-    if (product.minimumOrderQty && qty <= product.minimumOrderQty) {
+    if (qty <= product.minimumOrderQty) {
       Swal.fire(`Minimum Order Quantity is : ${qty}`);
       setQty(product.minimumOrderQty);
     } else {
@@ -157,7 +157,7 @@ const Details = ({ productData }) => {
     if (qty > product.availableQty) {
       Swal.fire(`Minimum Order Quantity is : ${qty}`);
     } else {
-      setQty(qty + 1);
+      setQty(qty + (product.incDecBy !== undefined ? product.incDecBy : 1));
     }
   };
 

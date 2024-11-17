@@ -5,10 +5,13 @@ import userAuthReducer from '@/Redux/Reducers/userAuthReducer';
 import productReducer from '@/Redux/Reducers/productReducers';
 import orderReducers from '@/Redux/Reducers/orderReducers';
 
+
+
 const rootReducer = combineReducers({
   products: productReducer,
   auth: userAuthReducer,
   orders: orderReducers,
+
 });
 
 const store = configureStore({

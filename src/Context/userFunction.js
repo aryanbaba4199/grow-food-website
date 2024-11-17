@@ -5,36 +5,8 @@ import CryptoJS from "crypto-js";
 
 const cryptoKey = process.env.NEXT_PUBLIC_CRYPTO_KEY;
 
-export const getUserDetails = (id) => {
-  try {
-    const res = axios.get(`${getUserApi}/${id}`);
-    if (res.status === 200) {
-      return { status: true, data: res.data };
-    } else {
-      return { status: false, data: res.data };
-    }
-  } catch (err) {
-    return { status: false, data: err.data };
-  }
-};
 
-export const fetchUserDetails = async () => {
-  try {
-    const token = decryptData(localStorage.getItem("token"));
-    if (token) {
-      const response = await axios.get(`${usersAPi}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const secureData = encryptData(response.data);
-      localStorage.setItem("user", secureData);
-      return { data: response.data, status: true };
-    }
-  } catch (err) {
-    return { status: false, data: err };
-  }
-};
+
 
 
 export const encryptData = (data) => {

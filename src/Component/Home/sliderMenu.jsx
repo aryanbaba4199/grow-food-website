@@ -69,7 +69,7 @@ const Slide = ({ products, title, timer, path }) => {
           },
         }}
       >
-        {products.map((product, index) => (
+        {products.data.map((product, index) => (
           <div
             className="flex border-2 mt-2 ml-2 mb-1 p-2 rounded-sm  flex-col justify-center items-center hover:cursor-pointer"
             key={index}

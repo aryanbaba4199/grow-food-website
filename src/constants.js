@@ -23,7 +23,7 @@ export const sideBarData = [
     },
     {
         icon : <SiGooglecontaineroptimizedos/>, 
-        name : "Orders", 
+        name : "orders", 
         path : "/orders", 
     },
     
@@ -33,12 +33,12 @@ export const sideBarData = [
 export const AdminMenu = [
     {
         icon : <GrUserAdmin/>,
-        name : "Dashboard",
+        name : "dashboard",
         path : "/admin/dashboard"
     },
     {
         icon : <FaDatabase/>, 
-        name : "Orders", 
+        name : "orders", 
         path : "/admin/orders",
     }, 
     

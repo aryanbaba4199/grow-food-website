@@ -56,6 +56,8 @@ const Home = () => {
     productContainerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  console.log('products is', products)
+
 
   return (
     <>
@@ -68,6 +70,8 @@ const Home = () => {
           <div className="flex justify-center items-center mt-4">
             <Banner />
           </div>
+          {/* {products && products?.data?.length > 0 &&
+          <>
           <div className=" mt-4">
             <Slide
               products={brands}
@@ -85,6 +89,8 @@ const Home = () => {
               filter={handleCategoryFilter}
             />
           </div>
+          </>
+} */}
           <div className="drop-shadow-2xl  shadow-black">
             <div className="flex mt-8 justify-between txt-1 ">
               <span className="font-bold text-lg px-8 py-1">
@@ -111,7 +117,9 @@ const Home = () => {
             >
               {!isFilter ? (
                 <>
-                  {products.map((item, index) => (
+                {products?.data?.length!==0 &&
+                <>
+                  {products?.data?.map((item, index) => (
                     <>
                       {item.display !== false && (
                         <div
@@ -134,6 +142,8 @@ const Home = () => {
                       )}
                     </>
                   ))}
+                  </>
+                }
                 </>
               ) : (
                 <>

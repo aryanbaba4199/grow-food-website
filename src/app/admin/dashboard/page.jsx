@@ -99,7 +99,7 @@ const AnimatedNumber = ({ number }) => {
     reset: true,
     cancel: false,
   });
-
+  
   return (
     <animated.span>
       {value.to((v) => {
@@ -123,7 +123,7 @@ const Page = () => {
   const [products, setProducts] = useState([]);
   
   const [editProduct, setEditProduct] = useState(null);
-  const x = useSelector((state) => state.products.products)
+  const x = useSelector((state) => state.products.products.data)
 
   const getProducts = async()=>{
     if(user.userType==='Vendor'){

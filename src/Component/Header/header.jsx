@@ -106,7 +106,7 @@ const Header = () => {
                 <>
                   {showDashboard && (
                     <button
-                      onClick={() => router.push("/admin/Dashboard")}
+                      onClick={() => router.push("/admin/dashboard")}
                       className="bg-gray-100 text-[#15892e] w-20 rounded-md hover:bg-black hover:text-white text-center p-1"
                       href="Authentication"
                     >
@@ -218,7 +218,7 @@ const Header = () => {
               {showDashboard && (
                 <button
                   className="flex gap-2 hover:bg-gray-200 px-10 py-1 hover:ease-in-out hover:transform hover:text-black w-[100%] "
-                  onClick={() => router.push("/admin/Dashboard")}
+                  onClick={() => router.push("/admin/dashboard")}
                 >
                   <span className="mt-1 text-[#15892e]">
                     <GrUserAdmin />

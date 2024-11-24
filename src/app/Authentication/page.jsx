@@ -48,7 +48,7 @@ const Page = () => {
     setLoader(true);
     const userData = {
       email,
-      password : x,
+      password,
       ...(authType === "SignUp" && {
         userType,
         gst,

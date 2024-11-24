@@ -17,10 +17,10 @@ export const GET_BRANDS_PRODUCT = 'GET_BRANDS_PRODUCT';
 // Use the correct URL for React Native emulator
 const API_URL = productsAPi;
 
-export const getProducts = () => async dispatch => {
+export const getProducts = (page) => async dispatch => {
   try {
-    const response = await axios.get(API_URL);
-    dispatch({ type: GET_PRODUCTS, payload: response.data });
+    const response = await axios.get(`${API_URL}/${page??1}`);
+    dispatch({ type: GET_PRODUCTS, payload: response.data});
 
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -47,7 +47,7 @@ export const getBrandsProduct = (brand)=> async(dispatch)=>{
 
 export const getCategoriesProduct = (categories)=> async(dispatch)=>{
   try{
-    const res = await axios.get(`${getCategoriesProductApi}${categories}`)
+    const res = await axios.get(`${getCategoriesProductApi}/${categories}`)
     dispatch({type : 'GET_CATEGORY_PRODUCT', payload: res.data});
   }catch(err){
     console.error('Error fetching brands product', err);

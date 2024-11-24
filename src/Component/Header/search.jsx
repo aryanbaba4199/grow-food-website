@@ -1,36 +1,39 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { Autocomplete, TextField, InputAdornment } from "@mui/material";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import { getterFunction } from "@/Api";
+import { getterFunction, searchProductsApi } from "@/Api";
 
 const Search = () => {
   const [query, setQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [selectedProductId, setSelectedProductId] = useState(null);
   const router = useRouter();
 
-  // Fetch products based on the search input
-  const fetchProducts = async (searchTerm) => {
+  const fetchProducts = async (query) => {
     try {
       const response = await getterFunction(
-        `/api/helpers/search?query=${searchTerm}`
+        `${searchProductsApi}?query=${query}`
       );
-      setFilteredProducts(response.data); // Set search suggestions
+      const validProducts = (response || []).filter(
+        (product) => product && product.name
+      );
+      setFilteredProducts([...validProducts]); // Ensure a new reference
     } catch (error) {
       console.error("Error fetching products:", error);
     }
   };
+  
 
   const handleInputChange = (event, value) => {
     setQuery(value);
-    if (value.trim()) fetchProducts(value); // Fetch products as user types
+    if (value.trim()) {
+      fetchProducts(value);
+    }
   };
 
   const handleSearchSubmit = () => {
-    if (query.trim() && selectedProductId) {
-      router.push(`/Productdetails?product=${selectedProductId}`); // Redirect with productId
+    if (query.trim()) {
+      router.push(`/SearchResults?query=${query}`);
     }
   };
 
@@ -39,10 +42,13 @@ const Search = () => {
       (product) => product.name === value
     );
     if (selectedProduct) {
-      setSelectedProductId(selectedProduct._id); // Store the selected product's ID
       router.push(`/ProductDetails?product=${selectedProduct._id}`);
     }
   };
+
+
+
+  
 
   return (
     <div className="flex items-center w-full max-w-md mx-auto relative">
@@ -50,7 +56,7 @@ const Search = () => {
         freeSolo
         id="product-search"
         disableClearable
-        options={filteredProducts.map((option) => option.name)} // Options for autocomplete
+        options={filteredProducts.map((item) => item.name)}
         onInputChange={handleInputChange}
         onChange={handleProductSelect}
         renderInput={(params) => (
@@ -59,7 +65,7 @@ const Search = () => {
             onKeyPress={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
-                handleSearchSubmit(); // Trigger search on Enter key
+                handleSearchSubmit();
               }
             }}
             InputProps={{
@@ -74,10 +80,8 @@ const Search = () => {
               style: {
                 backgroundColor: "#f3f4f6",
                 color: "black",
-                padding: 0,
-                borderRadius: "4px",
-                paddingLeft: "8px",
-                paddingRight: "8px",
+                padding: "4px 8px",
+                borderRadius: "24px",
               },
             }}
           />
@@ -85,7 +89,7 @@ const Search = () => {
         sx={{
           width: "100%",
           "& .MuiOutlinedInput-root": {
-            borderRadius: "24px", // Rounded search box style
+            borderRadius: "24px",
           },
         }}
       />

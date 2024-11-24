@@ -119,7 +119,7 @@ const Details = ({ productData }) => {
         confirmButtonText: "Log in ",
       }).then((result) => {
         if (result.isConfirmed) {
-          router.push("/auth");
+          router.push("/Authentication");
         }
       });
     }
@@ -184,7 +184,7 @@ const Details = ({ productData }) => {
                 transitionDuration={700}
                 dotListClass="custom-dot-list-style"
               >
-                {(product.image.length === 0
+                {(product?.image?.length === 0
                   ? [
                       "https://www.nbu.ac.in/img/dept/anthropology/slider/slider3.jpg",
                     ]
@@ -365,10 +365,8 @@ const Details = ({ productData }) => {
             </div>
           </div>
           <div className="px-8 flex items-center gap-4">
-            <Typography fontWeight={800} fontSize={26}>
-              Description :
-            </Typography>
-            <Typography fontWeight={600}>{product.description}</Typography>
+           
+            <Typography color="#1f2937" fontFamily={"revert"} className="gray-800" fontWeight={600}>{product.description}</Typography>
           </div>
         </div>
       )}

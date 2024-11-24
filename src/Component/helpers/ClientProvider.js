@@ -10,6 +10,7 @@ import { getBrands } from "@/Redux/actions/productActions";
 import { getProducts} from "@/Redux/actions/productActions";
 import { UserProvider } from "@/userContext";
 import Header from "../Header/header";
+import Footer from "../Footer/footer";
 
 
 
@@ -35,6 +36,7 @@ export default function ClientProvider({ children }) {
         {children}
        
         </ReduxInitializer>
+        <Footer/>
     </Provider>
     </UserProvider>
   );

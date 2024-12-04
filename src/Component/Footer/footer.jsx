@@ -12,13 +12,13 @@ const Footer = () => {
       {/* Footer Links */}
       <div className="container mx-auto px-4 py-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
         {/* Column 1 */}
-        <div>
+        <div className="flex justify-start flex-col">
           <h4 className="font-bold text-lg mb-4">Get to Know Us</h4>
           <ul className="space-y-2 text-sm flex justify-start items-center flex-col">
-            <Link href={'/aboutus'}>About us</Link>
-            <Link href={'/privacypolicy'}>Privacy Policy</Link>
-            <Link href={'/termsandcondition'}>Terms and Condition</Link>
-            <Link href={'/paymenttnc'}>Refund Policies</Link>
+            <Link href={'/policies/aboutus'}>About us</Link>
+            <Link href={'/policies/privacypolicy'}>Privacy Policy</Link>
+            <Link href={'/policies/termsandcondition'}>Terms and Condition</Link>
+            <Link href={'/policies/paymenttnc'}>Refund Policies</Link>
           </ul>
         </div>
 
@@ -54,10 +54,10 @@ const Footer = () => {
       </div>
 
       {/* Footer Bottom */}
-      <div className="bg-[#131a22] py-4">
-        <div className=" text-sm flex justify-between items-center">
+      <div className="bg-[#131a22] py-4 p-x4">
+        <div className=" text-sm flex justify-center items-center">
           <p className="w-full">&copy; {new Date().getFullYear()} The Grow Food. All rights reserved.</p>
-          <p>Developed By Techie Warriors</p>
+          
         </div>
       </div>
     </footer>

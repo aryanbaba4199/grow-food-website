@@ -7,10 +7,10 @@ const PrivacyPolicy = () => {
       <Container>
         {/* Page Title */}
         <Typography variant="h3" className="text-center font-bold mb-8 text-gray-800">
-          Privacy Policy
+         Terms & Condition
         </Typography>
 
-        {/* Introduction */}
+       
         <Typography variant="h6" className="font-bold mb-4 text-gray-800">
           Effective Date: [Insert Date]
         </Typography>

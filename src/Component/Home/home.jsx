@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useEffect, useState, useRef } from "react";
 import ProductCard from "./productCard";
 import { IoIosArrowForward } from "react-icons/io";
@@ -6,38 +6,29 @@ import Banner from "./banner";
 import Loader from "../helpers/loader";
 import Slide from "./sliderMenu";
 import { useRouter } from "next/navigation";
-import {
-  getProducts,
-  getBrands,
-  getCategories,
-  memoize,
-} from "@/Context/productFunction";
-import {
-  decryptData,
-  encryptData,
-  fetchUserDetails,
-} from "@/Context/userFunction";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+
 import { useSelector } from "react-redux";
-import { Typography } from "@mui/material";
+
 
 const Home = () => {
   const [filteredBrand, setFilteredBrand] = useState([]);
   const [isFilter, setIsFilter] = useState(false);
-  
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
   const productContainerRef = useRef(null);
 
-  const products =useSelector((state)=>state.products.products);
-  const brands = useSelector((state)=>state.products.brands);
-  const categories = useSelector((state)=>state.products.categories);
+  const products = useSelector((state) => state.products.products);
+  const brands = useSelector((state) => state.products.brands);
+  const categories = useSelector((state) => state.products.categories);
 
-
-  
-
-    
-
-    
+  useEffect(() => {
+    if (products?.length) {
+      setLoading(false);
+    }
+  }, [products, brands, categories]);
 
   const handleBrandFilter = (brand) => {
     const brandView = products.filter((product) => product.brand === brand);
@@ -55,45 +46,42 @@ const Home = () => {
     productContainerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  console.log('products is', products)
-
+  console.log("products is", products);
 
   return (
     <>
-
-
-      {!products && products.length === null && products.length === 0 ? (
+      {products.length === 0 ? (
         <Loader />
       ) : (
         <div className=" px-4 w-full md:mt-0 mt-14">
           <div className="flex justify-center items-center mt-4">
             <Banner />
           </div>
-           {products && products?.data?.length > 0 &&
-          <>
-          {products &&
-          <>
-          <div className=" mt-4">
-            <Slide
-              products={brands}
-              title="Shop By Brand"
-              path = 'brands'
-              timer={24}
-              filter={handleBrandFilter}
-            />
-          </div>
-          <div className=" mt-8">
-            <Slide
-              products={categories}
-              title="Shop By Categories"
-              timer={24}
-              filter={handleCategoryFilter}
-            />
-          </div>
-          </>
-            }
-          </>
-} 
+          {products && products?.data?.length > 0 && (
+            <>
+              {products && (
+                <>
+                  <div className=" mt-4">
+                    <Slide
+                      products={brands}
+                      title="Shop By Brand"
+                      path="brands"
+                      timer={24}
+                      filter={handleBrandFilter}
+                    />
+                  </div>
+                  <div className=" mt-8">
+                    <Slide
+                      products={categories}
+                      title="Shop By Categories"
+                      timer={24}
+                      filter={handleCategoryFilter}
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          )}
           <div className="drop-shadow-2xl  shadow-black">
             <div className="flex mt-8 justify-between txt-1 ">
               <span className="font-bold text-lg px-8 py-1">
@@ -120,33 +108,32 @@ const Home = () => {
             >
               {!isFilter ? (
                 <>
-                {products?.data?.length!==0 &&
-                <>
-                  {products?.data?.map((item, index) => (
+                  {products?.data?.length !== 0 && (
                     <>
-                      {item.display !== false && (
-                        <div
-                          className="flex-1"
-                          key={index}
-                          onClick={() => {
-                      
-                            router.push(
-                              `/ProductDetails?product=${item._id}`
-                            );
-                          }}
-                        >
-                          <ProductCard
-                            key={index}
-                            item={item}
-                            isCart={false}
-                            deleteCartItem={false}
-                          />
-                        </div>
-                      )}
+                      {products?.data?.map((item, index) => (
+                        <>
+                          {item.display !== false && (
+                            <div
+                              className="flex-1"
+                              key={index}
+                              onClick={() => {
+                                router.push(
+                                  `/ProductDetails?product=${item._id}`
+                                );
+                              }}
+                            >
+                              <ProductCard
+                                key={index}
+                                item={item}
+                                isCart={false}
+                                deleteCartItem={false}
+                              />
+                            </div>
+                          )}
+                        </>
+                      ))}
                     </>
-                  ))}
-                  </>
-                }
+                  )}
                 </>
               ) : (
                 <>

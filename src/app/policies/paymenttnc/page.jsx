@@ -114,7 +114,7 @@ const BusinessPage = () => {
             Need Assistance?
           </Typography>
           <Typography className="text-gray-600">
-            Contact our support team at <strong>support@thegrowfood.com</strong> or call us at <strong>+1 234 567 890</strong>.
+            Contact our support team at <strong>support@thegrowfood.com</strong> or call us at <strong>+91-8264103104</strong>.
           </Typography>
         </Box>
       </Container>

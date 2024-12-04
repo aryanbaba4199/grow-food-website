@@ -1,27 +1,32 @@
 import React from "react";
-import { Dialog } from "@mui/material";
+
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Loader = () => {
   return (
-    <Dialog
-      open={true}
-      PaperProps={{
-        style: {
-          backgroundColor: 'inherit',
-          boxShadow: 'none',
-        },
-      }}
-      BackdropProps={{
-        style: {
-          backgroundColor: 'rgba(0, 0, 0, 0.2)', // Semi-transparent black
-        },
-      }}
-    >
-      <div className=" mb-16 text-center bg-transparent flex flex-col justify-center items-center overflow-hidden">
-        <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-[#1e4426] mx-auto"></div>
-        {/* <h2 className="text-black px-4 mt-4 font-mono ml-8 text-md">Loading...</h2> */}
-      </div>
-    </Dialog>
+    <>
+    <div className="flex flex-wrap gap-4 p-4">
+      {Array(9)
+        .fill("")
+        .map((_, index) => (
+          <div
+            key={index}
+            className="flex flex-col justify-center items-center border-2 p-2 rounded-sm"
+          >
+            <Skeleton
+              circle={true}
+              height={112} // Matches the image height and width
+              width={112}
+              className="shadow-md border-1 rounded-full"
+            />
+            <Skeleton width={80} height={20} className="mt-2" />
+            <p className="bg-gray-300 w-28"></p>
+          </div>
+        ))}
+    </div>
+    
+  </>
   );
 };
 

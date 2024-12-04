@@ -39,7 +39,7 @@ export const deleteCartItem = `${apiurl}/api/orders/deleteCart`
 
 
 // ---------------Products Api ---------------------------
-export const productsAPi = `${apiurl}/api/products/product`
+export const productsAPi = `${apiurl}/api/products/getAllProducts`
 export const getProductbyId = `${apiurl}/api/products/product`
 export const createProduct = `${apiurl}/api/products`
 export const getProductsApi = `${apiurl}/api/products`

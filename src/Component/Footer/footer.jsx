@@ -14,7 +14,7 @@ const Footer = () => {
         {/* Column 1 */}
         <div>
           <h4 className="font-bold text-lg mb-4">Get to Know Us</h4>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-2 text-sm flex justify-start items-center flex-col">
             <Link href={'/aboutus'}>About us</Link>
             <Link href={'/privacypolicy'}>Privacy Policy</Link>
             <Link href={'/termsandcondition'}>Terms and Condition</Link>

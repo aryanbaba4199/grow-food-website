@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "@/Component/Home/productCard";
 import Loader from "@/Component/helpers/loader";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Head from "next/head";
 import { useDispatch, useSelector } from "react-redux";
 import { getBrandsProduct, getCategoriesProduct } from "@/Redux/actions/productActions";
@@ -17,9 +17,10 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [isBottomLogged, setIsBottomLogged] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const brands = searchParams.get("brands");
-  const categories = searchParams.get("categories");
+  const {query} = useRouter();
+
+  const brands = query?.brands
+  const categories = query?.categories
   const dispatch = useDispatch();
 
   useEffect(() => {

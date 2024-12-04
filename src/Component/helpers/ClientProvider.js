@@ -9,8 +9,8 @@ import { getCategories } from "@/Redux/actions/productActions";
 import { getBrands } from "@/Redux/actions/productActions";
 import { getProducts} from "@/Redux/actions/productActions";
 import { UserProvider } from "@/userContext";
-import Header from "../Header/header";
-import Footer from "../Footer/footer";
+import Header from "../Header/Header";
+import Footer from "../Footer/Footer";
 
 
 

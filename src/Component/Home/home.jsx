@@ -1,6 +1,5 @@
 'use client'
 import React, { useEffect, useState, useRef } from "react";
-
 import ProductCard from "./productCard";
 import { IoIosArrowForward } from "react-icons/io";
 import Banner from "./banner";
@@ -70,7 +69,9 @@ const Home = () => {
           <div className="flex justify-center items-center mt-4">
             <Banner />
           </div>
-          {/* {products && products?.data?.length > 0 &&
+           {products && products?.data?.length > 0 &&
+          <>
+          {products &&
           <>
           <div className=" mt-4">
             <Slide
@@ -90,7 +91,9 @@ const Home = () => {
             />
           </div>
           </>
-} */}
+            }
+          </>
+} 
           <div className="drop-shadow-2xl  shadow-black">
             <div className="flex mt-8 justify-between txt-1 ">
               <span className="font-bold text-lg px-8 py-1">

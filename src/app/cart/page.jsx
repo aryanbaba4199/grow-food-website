@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import Loader from "@/Component/helpers/loader";
 import { useRouter } from "next/navigation";
 import { Button, Dialog } from "@mui/material";
-import Checkout from "@/Component/checkout/checkout";
+import Checkout from "@/Component/Checkout/checkout";
 import { encryptData } from "@/Context/userFunction";
 import Head from "next/head";
 import { useSelector } from "react-redux";

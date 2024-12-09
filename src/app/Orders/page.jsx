@@ -1,9 +1,7 @@
-'use client'
+'use client';
 import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   getOrdersByUser,
-  getProductbyId,
-  updateOrderbyId,
   deleteOrderbyId,
 } from "@/Api";
 import axios from "axios";
@@ -11,59 +9,27 @@ import UserContext from "@/userContext";
 import Loader from "@/Component/helpers/loader";
 import Swal from "sweetalert2";
 import { MdDelete, MdDownload } from "react-icons/md";
-import { decryptData } from "@/Context/userFunction";
 import Head from "next/head";
-import { Typography } from "@mui/material";
+import { Typography, Card, CardContent, CardMedia, Button } from "@mui/material";
 import Link from "next/link";
+
 const Page = () => {
   const { user } = useContext(UserContext);
-  const [userAddress, setUserAddress] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [orderIds, setPageIds] = useState([]);
-  const [loader, setLoader] = useState(false);
-
-  const ref = useRef(false);
+  const [loader, setLoader] = useState(true);
 
   useEffect(() => {
     if (user && user._id) {
-      getPage(user._id);
+      fetchOrders(user._id);
     }
   }, [user]);
 
-  useEffect(() => {
-    setLoader(true);
-    ref.current = true;
-    if (typeof window !== "undefined" && ref.current) {
-      // Retrieve the address string from localStorage
-      const addresses = localStorage.getItem("userAddress");
-
-      // Check if the addresses exist and parse them
-      let parsedAddresses = [];
-      if (addresses) {
-        try {
-          parsedAddresses = decryptData(addresses);
-        } catch (e) {
-          console.error("Failed to parse address:", e);
-          parsedAddresses = []; // Provide a fallback value
-        }
-      }
-
-      setUserAddress(parsedAddresses);
-    }
-    setLoader(false);
-    return () => {
-      ref.current = false;
-    };
-  }, []);
-
-  const getPage = async (id) => {
+  const fetchOrders = async (id) => {
     setLoader(true);
     try {
       const res = await axios.get(`${getOrdersByUser}/${id}`);
       if (res.status === 200) {
-        setPageIds(res.data);
-        const productIds = res.data.map((item) => item.productId);
-        getProductsfromId(productIds);
+        setOrders(res.data);
       }
     } catch (e) {
       console.error(e);
@@ -72,41 +38,14 @@ const Page = () => {
     }
   };
 
-  const getProductsfromId = async (productIds) => {
-    setLoader(true);
-    try {
-      const productDetails = await Promise.all(
-        productIds.map(async (id) => {
-          try {
-            console.log('getting product by id', id)
-            const res = await axios.get(`${getProductbyId}/${id}`);
-            return res.data;
-          } catch (e) {
-            console.error(e);
-          }
-        })
-      );
-
-      setOrders(productDetails || []); // Ensure Page is always an array
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoader(false);
-    }
-  };
-
-  console.log('page jave', orders)
-
   const handleDelete = (id) => {
     Swal.fire({
-      title: "Warning",
+      title: "Cancel Order",
       icon: "warning",
-      text: "Are you sure want to cancel this order",
+      text: "Are you sure you want to cancel this order?",
       showDenyButton: true,
-      denyButtonText: "Close",
-      confirmButtonColor: "red",
-      denyButtonColor: "black",
-      confirmButtonText: "Cancel Order",
+      confirmButtonText: "Yes, Cancel",
+      denyButtonText: "No, Keep It",
     }).then((result) => {
       if (result.isConfirmed) {
         const deleteOrder = async () => {
@@ -114,20 +53,12 @@ const Page = () => {
           try {
             const res = await axios.delete(`${deleteOrderbyId}/${id}`);
             if (res.status === 200) {
-              Swal.fire({
-                title: "Cancelled",
-                icon: "success",
-                text: "Order Cancelled successfully...",
-              });
-              getPage(user._id);
+              Swal.fire("Cancelled", "Order was cancelled successfully.", "success");
+              fetchOrders(user._id);
             }
           } catch (error) {
             console.error(error);
-            Swal.fire({
-              title: "Failure",
-              icon: "error",
-              text: error.message,
-            });
+            Swal.fire("Error", error.message, "error");
           } finally {
             setLoader(false);
           }
@@ -136,153 +67,94 @@ const Page = () => {
       }
     });
   };
-  console.log(orderIds)
 
   return (
     <>
-    <Head>
-          <title>The Grow Food</title>
-          <meta name="description" content="The Grow Food Is B2B solution for Restaurants" />
-          <meta name="keywords" content=" Rastaurants, Hotels, Foods, B2B" />
-        </Head>
+      <Head>
+        <title>The Grow Food</title>
+        <meta name="description" content="The Grow Food Is B2B solution for Restaurants" />
+        <meta name="keywords" content="Restaurants, Hotels, Foods, B2B" />
+      </Head>
+
       {loader ? (
         <Loader />
       ) : (
-        <>
-          <div className="">
-            <div className="flex justify-center items-center mt-2">
-              <span className="border-color-1 border-2 px-4 py-1 text-xl rounded-md">
-                Your Orders
-              </span>
+        <div className="container mx-auto p-4">
+          <Typography variant="h4" className="text-center mb-6 font-bold text-green-600">
+            Your Orders
+          </Typography>
+
+          {orders.length === 0 ? (
+            <div className="text-center flex flex-col items-center">
+              <Typography variant="h6" className="text-gray-700">
+                You haven’t made any orders yet.
+              </Typography>
+              <Link href="/Products">
+                <Button variant="contained" color="success" className="mt-4">
+                  Explore Products
+                </Button>
+              </Link>
             </div>
-            {!orderIds && <>
-            <div className="flex flex-col justify-center items-center h-screen">
-              <Typography>You did not make any orders yet</Typography>
-              <Link href='/Products' className="bg-[#15892e] text-white p-2 px-4 rounded-md mt-8">Lets Make a Order</Link>
-            </div>
-            
-            </>}
-            {orderIds && orderIds?.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => {
-                  Swal.fire({
-                    title: "Make Changes in this Order",
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    denyButtonText: `Delete`,
-                    confirmButtonText: "Update",
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      handleUpdate(item._id);
-                    } else if (result.isDenied) {
-                      handleDelete(item._id);
-                    }
-                  });
-                }}
-                className="flex flex-col gap-2 md:flex-row justify-between py-1 px-2 mt-2 shadow-md shadow-green-600"
-              >
-                <div className="flex-1 flex justify-evenly items-center">
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {orders.map((order, index) => (
+                <Card key={index} className="shadow-lg">
+                  <div className="h-0 translate-x-64 translate-y-12">
                   <img
-                    src={orders[index]?.image[index]}
-                    alt="Grow Food"
-                    className="w-24 h-24 rounded-md"
+                    className="h-32  rounded-md shadow-sm shadow-black"
+                    src={order.productDetails.image[0] || "/placeholder.jpg"}
+                    alt={order.name || "Product Image"}
                   />
-                  <div className="flex flex-col pl-4">
-                    <span className="bg-color-1 px-2 text-green-700 font-semibold rounded-sm w-full">
-                      Product Details
-                    </span>
-                    <span>{orders[index]?.name}</span>
-                    <span>{orders[index]?.categories}</span>
-                    <span>Price : {orders[index]?.price}/-</span>
-                    <span>Discount : {orders[index]?.discount}%</span>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <div>
-                    <span className="bg-color-1 px-2 text-green-700 font-semibold rounded-sm w-full">
-                      Delivery Address
-                    </span>
+                  <CardContent>
+                    <Typography className="font-semibold w-[80%] text-green-700 mb-1">
+                      {order.productDetails.name || "Product Name"}
+                    </Typography>
+                    <Typography className="text-gray-700">
+                      Category: {order?.productDetails?.categories || "N/A"}
+                    </Typography>
+                    <Typography className="text-gray-700">
+                      Brand : {order?.productDetails?.categories || "N/A"}
+                    </Typography>
+                    <Typography className="text-gray-700">
+                      Price: ₹ {order.productDetails.price?.toFixed(2)}/-
+                    </Typography>
+
+                    <Typography className="text-gray-700 mt-2">
+                      Quantity: {order.quantity}
+                    </Typography>
+                    <Typography className="text-gray-700">
+                      Order Date: {order.date?.split("T")[0]}
+                    </Typography>
+                    <Typography className="text-gray-700">
+                      Status: {order.status || "Not Processed"}
+                    </Typography>
+                    <Typography className="text-gray-700 mt-2">
+                      Address: {`${order.addressDetails.name} ${order.addressDetails.mobile}`}
+                      <Typography className="text-gray-700">
+                        {`${order.addressDetails.locality} ${order.addressDetails.city } ${order.addressDetails.state} ${order.addressDetails.zip}` }
+                      </Typography>
+                    </Typography>
+                    <Typography className="text-gray-700 mt-4">
+                      Total Amount: ₹ {order.orderAmount?.toFixed(2) || "0.00"}/-
+                    </Typography>
+                  </CardContent>
+                  <div className="flex justify-between p-4">
+                    <MdDownload
+                      className="text-green-700 text-2xl hover:cursor-pointer"
+                      title="Download Invoice"
+                    />
+                    <MdDelete
+                      className="text-red-600 text-2xl hover:cursor-pointer"
+                      title="Cancel Order"
+                      onClick={() => handleDelete(order._id)}
+                    />
                   </div>
-                  <span>
-                    {
-                      userAddress.find(
-                        (item) => item._id === orderIds[index]?.addressId
-                      )?.name
-                    }
-                  </span>
-                  <span>
-                    {
-                      userAddress.find(
-                        (item) => item._id === orderIds[index]?.addressId
-                      )?.mobile
-                    }
-                  </span>
-                  <div className="flex gap-2">
-                    <span>
-                      {
-                        userAddress.find(
-                          (item) => item._id === orderIds[index]?.addressId
-                        )?.landmark
-                      }
-                    </span>
-                    <span>
-                      {
-                        userAddress.find(
-                          (item) => item._id === orderIds[index]?.addressId
-                        )?.locality
-                      }
-                    </span>
-                    <span>
-                      {
-                        userAddress.find(
-                          (item) => item._id === orderIds[index]?.addressId
-                        )?.city
-                      }
-                    </span>
-                    <span>
-                      {
-                        userAddress.find(
-                          (item) => item._id === orderIds[index]?.addressId
-                        )?.state
-                      }
-                    </span>
-                    <span>
-                      {" "}
-                      -{" "}
-                      {
-                        userAddress.find(
-                          (item) => item._id === orderIds[index]?.addressId
-                        )?.zip
-                      }
-                    </span>
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-between items-center">
-                  <div className="">
-                    <div>
-                      <span className="bg-color-1 px-2 text-green-700 font-semibold rounded-sm w-full">
-                        Order Details
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span>Quantity : {item.quantity}</span>
-                      <span>Order Date : {item.date && item.date?.split("T")[0]}</span>
-                      <span>Amount : {item.orderAmount}/-</span>
-                      <span>Status : {item.status ?? "Not Processed"}</span>
-                    </div>
-                    
-                  </div>
-                  <div className="pr-4 flex flex-col items-center h-full justify-between py-2">
-                      <MdDownload className="bg-color-1 h-8 w-8 rounded-full p-1 hover:cursor-pointer" />
-                      <MdDelete className="text-red-600 bg-red-300 h-8 w-8 rounded-full p-1 hover:cursor-pointer"/>
-                  </div>
-                </div>
-                
-              </div>
-            ))}
-          </div>
-        </>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </>
   );

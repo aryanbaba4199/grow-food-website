@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import UserContext from "@/userContext";
-import Checkout from "../checkout/checkout";
+import Checkout from "../Checkout/checkout";
 import { FaCirclePlus, FaCircleMinus } from "react-icons/fa6";
 import axios from "axios";
 import { cartApi, createCartApi } from "@/Api";
@@ -129,7 +129,10 @@ const Details = ({ productData }) => {
     if (token !== "") {
       setCheckoutProduct([product]);
       setEmail(user?.user?.email);
-      setOpen(true);
+      localStorage.setItem('products', JSON.stringify([product]));
+      localStorage.setItem('qty', JSON.stringify([qty]));
+      localStorage.setItem('route', 'buy');
+      router.push('/checkout')
     } else {
       Swal.fire({
         title: "Log in Required",

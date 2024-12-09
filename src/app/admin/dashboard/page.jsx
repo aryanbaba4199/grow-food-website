@@ -41,6 +41,7 @@ import UserContext from "@/userContext";
 import { adminOrders, getterFunction, vendorOrdersApi } from "@/Api";
 import { useSelector } from "react-redux";
 import EditProducts from "@/Component/Admin/products/EditProducts";
+import OrdersTable from "@/Component/Admin/Dashboard/OrdersTable";
 
 // Dummy data for Recharts
 const lineChartData = [
@@ -144,35 +145,44 @@ const Page = () => {
     }
   }, [user]);
   const vendorOrder = async (id) => {
-    if(user.userType==='admin'){
-      const res = await getterFunction(`${adminOrders}=${id}`);
-     setOrders(res.data);
-    }else if(user.userType==='Vendor'){
-    const res = await getterFunction(`${vendorOrdersApi}?id=${id}`);
-    setOrders(res.data);
+   
+    try {
+      if(user.userType==='admin'){
+        const res = await getterFunction(`${adminOrders}?id=${id}&&pageNum=${1}`);
+      
+       setOrders(res.orders);
+      }else if(user.userType==='Vendor'){
+       
+      const res = await getterFunction(`${vendorOrdersApi}?id=${id}&&pageNum=${1}`);
+  
+      setOrders('order have',res.data);
+      }
+    } catch (error) {
+      setOrders([]);
+      console.error('Error in getting admin orders')
     }
   };
 
-  console.log(`getOrders`, orders);
 
-  const cardData = [
+
+  const cardData = products && [
     {
       icon: (
         <MdOutlineProductionQuantityLimits className="text-3xl text-green-600" />
       ),
       name: "Products",
-      progress: Math.min((products.length / 500) * 100, 100),
-      volume: products.length,
+      progress: Math.min((products?.length / 500) * 100, 100),
+      volume: products?.length,
     },
     {
       icon: <AiFillProject className="text-3xl text-orange-500" />,
       name: "Stocks",
       progress: Math.min(
-        (products.reduce((sum, product) => sum + product.availableQty, 0) /
+        (products?.reduce((sum, product) => sum + product?.availableQty, 0) /
           5000) *
           100
       ),
-      volume: products.reduce((sum, product) => sum + product.availableQty, 0),
+      volume: products?.reduce((sum, product) => sum + product?.availableQty, 0),
     },
     {
       icon: <MdShowChart className="text-3xl text-blue-500" />,
@@ -187,8 +197,6 @@ const Page = () => {
       volume: 300,
     },
   ];
-  console.log('products', products);
-  console.log('orders', orders);
 
   return (
     <>
@@ -211,7 +219,7 @@ const Page = () => {
 
             {/* Summary Cards */}
             <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-8">
-              {cardData.map((item, index) => (
+              {cardData && cardData.map((item, index) => (
                 <Card
                   key={index}
                   className="p-6 shadow-md hover:shadow-lg transition-shadow"
@@ -305,82 +313,18 @@ const Page = () => {
 
             {/* Table */}
             <div className="bg-white p-4 rounded-md shadow-md">
-              <div className="flex justify-between  items-center">
+              <div className="flex justify-start  items-center">
                 <Typography variant="h6" className="mb-4">
                   {" "}
-                  Order Management{" "}
+                  Orders{" "}
                 </Typography>
+                <p>{orders.totalOrders}</p>
                 
               </div>
 
-              {orders.length !== 0 && (
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>
-                          <strong>Name</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Category</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Life</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Price</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Stock</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Product Qty</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Min Order Qty</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Status</strong>
-                        </TableCell>
-                        <TableCell>
-                          <strong>Action</strong>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {products.map((row, index) => (
-                        <TableRow key={index}>
-                          <TableCell> {row.name} </TableCell>
-                          <TableCell> {row.categories} </TableCell>
-                          <TableCell> {row.life} </TableCell>
-                          <TableCell> {row.sellingPrice} </TableCell>
-                          <TableCell> {row.availableQty} </TableCell>
-                          <TableCell> {row.productQty} </TableCell>
-                          <TableCell> {row.minimumOrderQty} </TableCell>
-                          <TableCell>
-                            {" "}
-                            {row.status
-                              ? row.status
-                              : `${
-                                  row.availableQty > 0
-                                    ? "Available"
-                                    : "Not Available"
-                                }`}{" "}
-                          </TableCell>
-                          <TableCell>
-                            <FaEye
-                              className="text-lg text-[#15892e]"
-                              onClick={() => setProductView(row)}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
+             <OrdersTable orders={orders}/>
             </div>
-            {products.length !== 0 && (
+            {products?.length !== 0 && (
               <div className="bg-white p-4 rounded-md shadow-md">
                 <div className="flex justify-between  items-center">
                   <Typography variant="h6" className="mb-4">
@@ -430,7 +374,7 @@ const Page = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {products.map((row, index) => (
+                      {products && products.map((row, index) => (
                         <TableRow key={index}>
                           <TableCell> {row.name} </TableCell>
                           <TableCell> {row.categories} </TableCell>

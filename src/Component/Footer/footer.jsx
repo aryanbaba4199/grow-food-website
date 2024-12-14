@@ -54,7 +54,7 @@ const Footer = () => {
       </div>
 
       {/* Footer Bottom */}
-      <div className="bg-[#131a22] py-4 p-x4">
+      <div className="bg-[#131a22] py-4 p-x4 flex justify-center items-center">
         <div className=" text-sm flex justify-center items-center">
           <p className="w-full">&copy; {new Date().getFullYear()} The Grow Food. All rights reserved.</p>
           

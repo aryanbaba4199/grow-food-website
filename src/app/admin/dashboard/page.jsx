@@ -42,6 +42,7 @@ import { adminOrders, getterFunction, vendorOrdersApi } from "@/Api";
 import { useSelector } from "react-redux";
 import EditProducts from "@/Component/Admin/products/EditProducts";
 import OrdersTable from "@/Component/Admin/Dashboard/OrdersTable";
+import CreateBrand from "@/Component/Admin/createBrand";
 
 // Dummy data for Recharts
 const lineChartData = [
@@ -406,6 +407,9 @@ const Page = () => {
                 </TableContainer>
               </div>
             )}
+            <div>
+              <CreateBrand/>
+            </div>
           </div>
 
           <Dialog

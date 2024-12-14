@@ -32,11 +32,12 @@ const OrdersTable = ({ orders }) => {
     setOpen(false); // Close the dialog
   };
 
+
   return (
     <>
       {orders && (
         <div>
-          {orders.length !== 0 && (
+          {orders.length !==0 && (
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -74,10 +75,10 @@ const OrdersTable = ({ orders }) => {
                   {orders.map((row, index) => (
                     <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
-                      <TableCell> {row.productDetails.name} </TableCell>
-                      <TableCell> {row.productDetails.brand} </TableCell>
+                      <TableCell> {row.productDetails?.name} </TableCell>
+                      <TableCell> {row.productDetails?.brand} </TableCell>
                       <TableCell> {row.quantity} </TableCell>
-                      <TableCell> {row.productDetails.sellingPrice} </TableCell>
+                      <TableCell> {row.productDetails?.sellingPrice} </TableCell>
                       <TableCell> {row.orderAmount} </TableCell>
                       <TableCell> {row.paymentId} </TableCell>
                       <TableCell> {row.address[0]?.name} </TableCell>
@@ -119,29 +120,29 @@ const OrdersTable = ({ orders }) => {
                     </p>
                     <p>
                       <strong>Product Name:</strong>{" "}
-                      {selectedOrder.productDetails.name}
+                      {selectedOrder.productDetails?.name}
                     </p>
                     <p>
                       <strong>Category :</strong>{" "}
-                      {selectedOrder.productDetails.categories}
+                      {selectedOrder.productDetails?.categories}
                     </p>
                     <p>
                       <strong>Brand:</strong>{" "}
-                      {selectedOrder.productDetails.brand}
+                      {selectedOrder.productDetails?.brand}
                     </p>
                     <p>
                       <strong>Discount :</strong>{" "}
-                      {selectedOrder.productDetails.discount}{" "}
-                      {selectedOrder.productDetails.discountType}
+                      {selectedOrder.productDetails?.discount}{" "}
+                      {selectedOrder.productDetails?.discountType}
                     </p>
 
                     <p>
                       <strong>Price:</strong>{" "}
-                      {selectedOrder.productDetails.price}
+                      {selectedOrder.productDetails?.price}
                     </p>
                     <p>
                       <strong>Price:</strong>{" "}
-                      {selectedOrder.productDetails.sellingPrice}
+                      {selectedOrder.productDetails?.sellingPrice}
                     </p>
                     </Card>
 

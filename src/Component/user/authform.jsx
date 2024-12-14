@@ -49,7 +49,7 @@ const Authform = ({
     <>
       <div className="container items-center">
         <div className="flex justify-center items-center text-2xl font-bold">
-          <span>Join Grow Food</span>
+          <span className="text-[#15892e]">The Grow Food</span>
         </div>
         <Container maxWidth="sm">
           <div style={styles.container}>

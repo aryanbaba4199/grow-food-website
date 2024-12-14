@@ -8,6 +8,7 @@ import "react-multi-carousel/lib/styles.css";
 
 
 
+
 const ProductCard = ({ item, index}) => {
 
  
@@ -77,16 +78,19 @@ const ProductCard = ({ item, index}) => {
             </div>
 
             <div className="flex gap-2 justify-between place-items-end mt-2 flex-row w-full px-2 text-gray-600 ">
-              <span className="flex gap-[1px] text-sm">
-                <FaRupeeSign className="mt-[5px] text-sm" />
-                <Typography>{item.price}</Typography>
+              {item.price &&
+              <span className="flex gap-[1px] text-sm justify-center items-center">
+                <FaRupeeSign className="mt-[5px] text-xs mb-1" />
+                <p className="text-xs">{item.price}</p>
               </span>
-              <span>
-                <span className="text-green-700 text-xs">{parseInt(item.discount)}% off</span>
+              }
+              <span className="w-16 flex justify-center items-center">
+                
+                <span className="text-green-700 text-sm">{parseInt(item.discount)===0 ? '' : `${parseInt(item.discount)}% off`}</span>
               </span>
               <span className="flex bg-color-1 px-2 gap-1 rounded-md">
                 <FaRupeeSign className=" mt-[5px] text-sm" />
-                <span>{item.sellingPrice ?? 100}</span>
+                <span>{item.sellingPrice}</span>
               </span>
             </div>
 

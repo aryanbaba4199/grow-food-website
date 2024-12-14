@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  bulkUploadApi,
   createProduct,
   createSubCategory,
   createUnit,
@@ -127,6 +128,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
         ...product, 
         vendorId : user._id ?? 0, 
         image : imageArray,
+        // discount : product.discount ? product.discount : 0, 
         // description: description || "No description available"
       }
     })
@@ -134,8 +136,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
     
     try {
       const formData = await Promise.all(formDataPromises);
-      console.log(formData);
-      const response = await axios.post("/api/bulk/products", {formData});
+      const response = await axios.post(bulkUploadApi, {formData});
       if (response.status === 200) {
         Swal.fire({
           title: "Success",
@@ -312,7 +313,7 @@ const CreateProduct = ({ setIndex, setCreateMode }) => {
 
   const sellingPriceCalculator = () => {
     const price = productData.price;
-    const discount = productData.discount;
+    const discount = productData.discount ? productData.discount : 0;
     if (discountType == "0") {
       const x = price - (price * discount) / 100;
       setProductData({ ...productData, sellingPrice: x });

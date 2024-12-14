@@ -151,40 +151,43 @@ const CreateBrand = () => {
   };
 
   const handleUpdate = async () => {
+
     if (!selectedBrand) return;
     setLoader(true);
-
-    try {
-      const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
-        name: brandName,
-        icon: iconURL ? iconURL : selectedBrand.icon,
-      });
-
-      if (res.status === 200) {
-        Swal.fire({
-          title: "Success",
-          icon: "success",
-          text: "Brand updated successfully",
+    const imageUpload = await handleImageUpload().then(async()=>{
+      try {
+        const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
+          name: brandName,
+          icon: iconURL ? iconURL : selectedBrand.icon,
         });
-        dispatch(getBrands());
-        handleClose();
-      } else {
+  
+        if (res.status === 200) {
+          Swal.fire({
+            title: "Success",
+            icon: "success",
+            text: "Brand updated successfully",
+          });
+          dispatch(getBrands());
+          handleClose();
+        } else {
+          Swal.fire({
+            title: "Failed",
+            icon: "error",
+            text: "Brand not found",
+          });
+        }
+      } catch (err) {
+        console.error("Error updating brand", err);
         Swal.fire({
           title: "Failed",
           icon: "error",
-          text: "Brand not found",
+          text: "Bad Response",
         });
+      } finally {
+        setLoader(false);
       }
-    } catch (err) {
-      console.error("Error updating brand", err);
-      Swal.fire({
-        title: "Failed",
-        icon: "error",
-        text: "Bad Response",
-      });
-    } finally {
-      setLoader(false);
-    }
+    });
+    
   };
 
   const resetForm = () => {
@@ -264,8 +267,7 @@ const CreateBrand = () => {
               <Button onClick={handleUpdate} color="primary">
                 Update
               </Button>
-              {decryptData(localStorage.getItem("user")).user.userType ===
-                "Admin" && (
+              
                 <Button
                   onClick={() => {
                     handleDelete();
@@ -274,7 +276,7 @@ const CreateBrand = () => {
                 >
                   Delete
                 </Button>
-              )}
+            
             </>
           ) : (
             <Button onClick={handleImageUpload} color="primary">

@@ -54,12 +54,12 @@ export const deleteProductApi = `${apiurl}/api/products?id=`
 export const getBrandsProductApi = `${apiurl}/api/productsFilter/brands?brand=`
 export const getCategoriesProductApi = `${apiurl}/api/products/categoriesProduct`
 export const searchProductsApi = `${apiurl}/api/products/search/searchInDatabase`
-
+export const bulkUploadApi = `${apiurl}/api/products/products/bulkCreate`
 
 
 
 // ---------------Brands Api ---------------------------
-export const updateBrandbyId = `${apiurl}/api/brands?id=`
+export const updateBrandbyId = `${apiurl}/api/products/updateBrand`
 export const deleteBrandbyId = `${apiurl}/api/brands?id=`
 export const getBrandsApi = `${apiurl}/api/products/brands`
 export const createUnit = `${apiurl}/api/unit`

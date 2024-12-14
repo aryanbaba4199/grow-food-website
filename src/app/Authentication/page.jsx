@@ -2,7 +2,16 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Authform from "@/Component/user/authform";
-import { authApi, forgotPasswordApi, getterFunction, getUserApi, posterFunction, registerApi, userAPI, userlogin } from "@/Api";
+import {
+  authApi,
+  forgotPasswordApi,
+  getterFunction,
+  getUserApi,
+  posterFunction,
+  registerApi,
+  userAPI,
+  userlogin,
+} from "@/Api";
 import { fetchUserDetails, logout } from "@/Redux/actions/userAuthAction";
 import Swal from "sweetalert2";
 import { usersAPi } from "@/Api";
@@ -13,6 +22,7 @@ import Loader from "@/Component/helpers/loader";
 import { useDispatch } from "react-redux";
 import Head from "next/head";
 import { Button, TextField } from "@mui/material";
+import Analytics from "@/Component/Admin/Analytics";
 
 const Page = () => {
   const [authType, setAuthType] = useState("SignIn");
@@ -27,7 +37,7 @@ const Page = () => {
   const [gst, setGst] = useState("");
   const [shopAddress, setShopAddress] = useState("");
   const [open, setOpen] = useState(false);
-  const [otp, setOtp]  = useState(null);
+  const [otp, setOtp] = useState(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [newPassword, setNewPassword] = useState(null);
   const [confirmPassword, setConfirmPassword] = useState(null);
@@ -36,75 +46,74 @@ const Page = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(token)
+    console.log(token);
     if (token) {
-      console.log('logingg')
+      console.log("logingg");
       router.push("/");
     }
   }, [user]);
 
   const handleAuthSwitch = () => {
-    
     setAuthType(authType == "SignIn" ? "SignUp" : "SignIn");
   };
 
-  const handleVerifyOtp = async() => {
-    try{
+  const handleVerifyOtp = async () => {
+    try {
       const formData = {
-        email, otp
-      }
-      const res = await posterFunction(authApi.verifyOtp, formData)
+        email,
+        otp,
+      };
+      const res = await posterFunction(authApi.verifyOtp, formData);
       setOpen(false);
       setResetOpen(true);
       Swal.fire({
-        title : 'Successfull',
+        title: "Successfull",
 
         text: res.message,
-        icon: 'success',
-      })
-    }catch(e){
+        icon: "success",
+      });
+    } catch (e) {
       Swal.fire({
-        title : 'Failed',
+        title: "Failed",
         text: e.message,
-        icon: 'error',
-      })
+        icon: "error",
+      });
       console.error(e);
     }
-    
   };
 
-  const handleResetPassword = async()=>{
-    if(newPassword!==confirmPassword){
+  const handleResetPassword = async () => {
+    if (newPassword !== confirmPassword) {
       Swal.fire({
-        title : 'Error',
-        text: 'Password mismatch',
-        icon: 'error',
-      })
+        title: "Error",
+        text: "Password mismatch",
+        icon: "error",
+      });
       return;
     }
-    try{
+    try {
       const formData = {
-        email, newPassword
-      }
-      const res = await posterFunction(authApi.resetPassword, formData)
+        email,
+        newPassword,
+      };
+      const res = await posterFunction(authApi.resetPassword, formData);
       Swal.fire({
-        title : 'Success',
-        icon: 'success',
+        title: "Success",
+        icon: "success",
         text: res.message,
-      })
+      });
       setResetOpen(false);
-      setAuthType('SignIn')
+      setAuthType("SignIn");
       router.refresh();
-    }catch(e){
+    } catch (e) {
       console.error(e);
       Swal.fire({
-        title : 'Error',
+        title: "Error",
         text: e,
-        icon: 'error',
+        icon: "error",
       });
     }
-
-  }
+  };
 
   const handleSubmit = async (event) => {
     setLoader(true);
@@ -120,42 +129,40 @@ const Page = () => {
         shopName,
       }),
     };
-    if(authType === "forgot"){
-      if(!email){
+    if (authType === "forgot") {
+      if (!email) {
         setLoader(false);
         Swal.fire({
-          title : 'Warning',
-          icon : 'warning',
-          text : 'Email is required',
-        })
+          title: "Warning",
+          icon: "warning",
+          text: "Email is required",
+        });
         return;
       }
-      try{
-         const res = await getterFunction(`${forgotPasswordApi}/${email}`)
-          setOpen(true);
-          Swal.fire({
-            title:'Successful',
-            text : res.message,
-            icon: 'success',
-          })
-      }catch(e){
+      try {
+        const res = await getterFunction(`${forgotPasswordApi}/${email}`);
+        setOpen(true);
         Swal.fire({
-          title:'Failure',
-          text : e,
-          icon: 'success',
-        })
+          title: "Successful",
+          text: res.message,
+          icon: "success",
+        });
+      } catch (e) {
+        Swal.fire({
+          title: "Failure",
+          text: e,
+          icon: "success",
+        });
         console.error(e);
-      }finally{
+      } finally {
         setLoader(false);
         return;
       }
     }
 
     if (authType === "SignIn") {
+      const formData = { email, password };
 
-      const formData = { email, password};
-      
-      
       try {
         const response = await posterFunction(userlogin, formData);
         const { token, user } = response;
@@ -182,9 +189,8 @@ const Page = () => {
           icon: "error",
           text: error.message,
         });
-        
       }
-    } else if(authType==='SignUp') {
+    } else if (authType === "SignUp") {
       try {
         const res = await axios.post(registerApi, userData);
         if (res.status === 200) {
@@ -210,7 +216,6 @@ const Page = () => {
           icon: "error",
           text: error.message,
         });
-     
       }
     }
   };
@@ -229,97 +234,118 @@ const Page = () => {
         <Loader />
       ) : (
         <>
-        <div className="mt-8">
-          <div className="flex flex-col justify-center items-center">
-            <img
-              src={logo_uri}
-              alt="Grow Food"
-              className=" w-32 border-green-700 shadow-black shadow-lg border-2 rounded-full p-4"
-            />
-            <h2 className="text-2xl font-semibold text-white bg-color-1 text-center mt-4 my-2 px-4 py-1 rounded-md">
-              {authType == "SignIn" ? "Sign In" : "Create Account"}
-            </h2>
-          </div>
-          {!open ? 
-          <Authform
-            authType={authType}
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-            name={name}
-            setName={setName}
-            mobile={mobile}
-            setMobile={setMobile}
-            handleAuthSwitch={handleAuthSwitch}
-            handleSubmit={handleSubmit}
-            shopName={shopName}
-            setShopName={setShopName}
-            gst={gst}
-            setGst={setGst}
-            shopAddress={shopAddress}
-            setShopAddress={setShopAddress}
-            setUserType={setUserType}
-          /> : <div className="flex justify-center items-center flex-col">
-            <p className="font-semibold text-lgg my-4">Please enter OTP ( You can get this on your email ) </p>
-              <TextField
-               type="number"
-               required
-               onChange={(e)=>setOtp(e.target.value)}
-               value={otp} 
+          <div className="mt-8">
+            <div className="flex flex-col justify-center items-center">
+              <img
+                src="/favicon.ico"
+                alt="Grow Food"
+                className=" w-32 h-32 border-green-700 shadow-black shadow-lg border-2 rounded-full p-4"
               />
-            </div>}
-            <>
-            {resetOpen && <>
-              <div className="flex justify-center items-center">
-                <div className="flex flex-col gap-4">
-                  <TextField
-                  required
-                  type="password"
-                    value={newPassword}
-                    onChange={(e)=>setNewPassword(e.target.value)}
-                    placeholder="New Password"
-                  />
-                  <TextField
-                  required
-                  type="password"
-                    value={confirmPassword}
-                    onChange={(e)=>setConfirmPassword(e.target.value)}
-                    placeholder="Confirm New Password"
-                  />
-                </div>
-              </div>
-            </>}
-            </>
-          {user?.user && (
-            <div className="mt-8 text-white">
-              <h3>User Details:</h3>
-              <p>Name: {user.name}</p>
-              <p>Email: {user.email}</p>
-              <p>Mobile: {user.mobile}</p>
-              {/* <p>Address: {user.address.address}, {user.address.city}, {user.address.state} - {user.address.zip}</p> */}
-              <button onClick={() => dispatch(logout())}>Sign Out</button>
+              <h2 className="text-2xl font-semibold text-white bg-color-1 text-center mt-4 my-2 px-4 py-1 rounded-md">
+                {authType == "SignIn" ? "Sign In" : "Create Account"}
+              </h2>
             </div>
+            {!open ? (
+              <Authform
+                authType={authType}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                name={name}
+                setName={setName}
+                mobile={mobile}
+                setMobile={setMobile}
+                handleAuthSwitch={handleAuthSwitch}
+                handleSubmit={handleSubmit}
+                shopName={shopName}
+                setShopName={setShopName}
+                gst={gst}
+                setGst={setGst}
+                shopAddress={shopAddress}
+                setShopAddress={setShopAddress}
+                setUserType={setUserType}
+              />
+            ) : (
+              <div className="flex justify-center items-center flex-col">
+                <p className="font-semibold text-lgg my-4">
+                  Please enter OTP ( You can get this on your email ){" "}
+                </p>
+                <TextField
+                  type="number"
+                  required
+                  onChange={(e) => setOtp(e.target.value)}
+                  value={otp}
+                />
+              </div>
+            )}
+            <>
+              {resetOpen && (
+                <>
+                  <div className="flex justify-center items-center">
+                    <div className="flex flex-col gap-4">
+                      <TextField
+                        required
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="New Password"
+                      />
+                      <TextField
+                        required
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm New Password"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+            {user?.user && (
+              <div className="mt-8 text-white">
+                <h3>User Details:</h3>
+                <p>Name: {user.name}</p>
+                <p>Email: {user.email}</p>
+                <p>Mobile: {user.mobile}</p>
+                {/* <p>Address: {user.address.address}, {user.address.city}, {user.address.state} - {user.address.zip}</p> */}
+                <button onClick={() => dispatch(logout())}>Sign Out</button>
+              </div>
+            )}
+          </div>
+          {open && (
+            <>
+              <div className="flex justify-center items-center mt-4">
+                <button
+                  onClick={handleVerifyOtp}
+                  className="bg-[#15892e] px-4 py-2 rounded-md text-white my-2"
+                >
+                  Validate OTP
+                </button>
+              </div>
+            </>
           )}
-          
-          
-        </div>
-        {open && <>
-          <div className="flex justify-center items-center mt-4">
-            <button onClick={handleVerifyOtp} className="bg-[#15892e] px-4 py-2 rounded-md text-white my-2">Validate OTP</button>
+          {resetOpen && (
+            <>
+              <div className="flex justify-center items-center mt-4">
+                <button
+                  onClick={handleResetPassword}
+                  className="bg-[#15892e] px-4 py-2 rounded-md text-white my-2"
+                >
+                  Validate OTP
+                </button>
+              </div>
+            </>
+          )}
+          <div className="flex justify-center py-4">
+            <Button onClick={() => setAuthType("forgot")}>
+              Forgot Password
+            </Button>
           </div>
-        </>}
-        {resetOpen && <>
-          <div className="flex justify-center items-center mt-4">
-            <button onClick={handleResetPassword} className="bg-[#15892e] px-4 py-2 rounded-md text-white my-2">Validate OTP</button>
-          </div>
-        </>}
-        <div className="flex justify-center">
-          <Button onClick={()=>setAuthType('forgot')}>Forgot Password</Button>
-        </div>
-        
         </>
       )}
+      
     </>
   );
 };

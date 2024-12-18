@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { IoMdCloseCircle } from "react-icons/io";
-import { FaStar, FaRupeeSign } from "react-icons/fa";
+import { FaStar, FaRupeeSign, FaEdit } from "react-icons/fa";
 
 import {
   Table,
@@ -26,6 +26,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { decryptData } from "@/Context/userFunction";
 import Loader from "../helpers/loader";
+import EditProducts from "../Admin/products/EditProducts";
 
 const Details = ({ productData }) => {
   const [checkoutProduct, setCheckoutProduct] = useState([]);
@@ -33,6 +34,7 @@ const Details = ({ productData }) => {
   const [product, setProduct] = useState(null); // Start with null or undefined
   const [qty, setQty] = useState(0);
   const [open, setOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
 
   const router = useRouter();
   const { token, user, searchInput } = useContext(UserContext);
@@ -129,10 +131,10 @@ const Details = ({ productData }) => {
     if (token !== "") {
       setCheckoutProduct([product]);
       setEmail(user?.user?.email);
-      localStorage.setItem('products', JSON.stringify([product]));
-      localStorage.setItem('qty', JSON.stringify([qty]));
-      localStorage.setItem('route', 'buy');
-      router.push('/checkout')
+      localStorage.setItem("products", JSON.stringify([product]));
+      localStorage.setItem("qty", JSON.stringify([qty]));
+      localStorage.setItem("route", "buy");
+      router.push("/checkout");
     } else {
       Swal.fire({
         title: "Log in Required",
@@ -164,6 +166,10 @@ const Details = ({ productData }) => {
     }
   };
 
+  const handleEdit = (product) => {
+    setEditProduct(product);
+  };
+
   return (
     <>
       {product === null ? (
@@ -171,6 +177,16 @@ const Details = ({ productData }) => {
       ) : (
         <div>
           <div className="flex flex-col md:flex-row justify-between  mt-8 px-4 gap-8 md:mb-0 mb-8">
+            <div className="absolute ml-[40rem] mt-4">
+              {user &&
+                (user._id === product.vendorId ||
+                  user?.userType === "admin") && (
+                  <FaEdit
+                    onClick={() => handleEdit(product)}
+                    className="text-[#15892e] text-xl hover:cursor-pointer"
+                  />
+                )}
+            </div>
             <div className="flex flex-col items-center w-full md:w-[45%]">
               <Carousel
                 className="w-full h-auto"
@@ -368,8 +384,14 @@ const Details = ({ productData }) => {
             </div>
           </div>
           <div className="px-8 flex items-center gap-4">
-           
-            <Typography color="#1f2937" fontFamily={"revert"} className="gray-800" fontWeight={600}>{product.description}</Typography>
+            <Typography
+              color="#1f2937"
+              fontFamily={"revert"}
+              className="gray-800"
+              fontWeight={600}
+            >
+              {product.description}
+            </Typography>
           </div>
         </div>
       )}
@@ -393,6 +415,9 @@ const Details = ({ productData }) => {
           setCopen={setOpen}
           // setOpen={setOpen}
         />
+      </Dialog>
+      <Dialog open={editProduct !== null} onClose={() => setEditProduct(null)}>
+        <EditProducts product={editProduct} setEditMode={setEditProduct} />
       </Dialog>
     </>
   );

@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaRupeeSign } from "react-icons/fa";
-import { Button, Dialog, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import UserContext from "@/userContext";
+import EditProducts from "../Admin/products/EditProducts";
+
+const ProductCard = ({ item, index }) => {
+  const { user } = useContext(UserContext);
 
 
-
-
-
-const ProductCard = ({ item, index}) => {
-
- 
-
+  
 
   const responsive = {
     superLargeDesktop: {
@@ -40,11 +45,12 @@ const ProductCard = ({ item, index}) => {
           <h2>No Product Found</h2>
         </div>
       ) : (
-        <div key={index} className="md:w-60 w-auto h-56 px-2 flex-1 border bg-gray-100 rounded-md flex flex-col pt-2 justify-center items-center cursor-pointer shadow-sm shadow-black hover:shadow-black hover:shadow-md">
-          <div
-            
-            className="w-full flex-1 justify-center items-center flex flex-col hover:scale-105 hover:ease-in-out hover:transition-all"
-          >
+        <div
+          key={index}
+          className="md:w-60 w-auto h-56 px-2 flex-1 border bg-gray-100 rounded-md flex flex-col pt-2 justify-center items-center cursor-pointer shadow-sm shadow-black hover:shadow-black hover:shadow-md"
+        >
+          
+          <div className="w-full flex-1 justify-center items-center flex flex-col hover:scale-105 hover:ease-in-out hover:transition-all">
             <Carousel
               className="w-full h-auto"
               responsive={responsive}
@@ -58,11 +64,19 @@ const ProductCard = ({ item, index}) => {
               transitionDuration={700}
               dotListClass="custom-dot-list-style"
             >
-              {(item.image.length===0 ? ["https://www.nbu.ac.in/img/dept/anthropology/slider/slider3.jpg"] : item.image).map((uri, index) => (
+              {(item.image.length === 0
+                ? [
+                    "https://www.nbu.ac.in/img/dept/anthropology/slider/slider3.jpg",
+                  ]
+                : item.image
+              ).map((uri, index) => (
                 <div className="flex justify-center" key={index}>
                   <img
-           
-                    src={uri ? uri : "https://www.nbu.ac.in/img/dept/anthropology/slider/slider3.jpg"}
+                    src={
+                      uri
+                        ? uri
+                        : "https://www.nbu.ac.in/img/dept/anthropology/slider/slider3.jpg"
+                    }
                     className="w-28 h-24 rounded-md"
                     alt={item.name}
                   />
@@ -71,33 +85,39 @@ const ProductCard = ({ item, index}) => {
             </Carousel>
 
             <div>
-              <Typography className="text-center" variant="subtitle2">{item.name}</Typography>
+              <Typography className="text-center" variant="subtitle2">
+                {item.name}
+              </Typography>
               <div className="flex justify-center items-center">
-              <Typography alignSelf='center' fontWeight={700} fontSize={16}>{item.categories.toUpperCase()}</Typography>
+                <Typography alignSelf="center" fontWeight={700} fontSize={16}>
+                  {item.categories.toUpperCase()}
+                </Typography>
               </div>
             </div>
 
             <div className="flex gap-2 justify-between place-items-end mt-2 flex-row w-full px-2 text-gray-600 ">
-              {item.price &&
-              <span className="flex gap-[1px] text-sm justify-center items-center">
-                <FaRupeeSign className="mt-[5px] text-xs mb-1" />
-                <p className="text-xs">{item.price}</p>
-              </span>
-              }
+              {item.price && (
+                <span className="flex gap-[1px] text-sm justify-center items-center">
+                  <FaRupeeSign className="mt-[5px] text-xs mb-1" />
+                  <p className="text-xs">{item.price}</p>
+                </span>
+              )}
               <span className="w-16 flex justify-center items-center">
-                
-                <span className="text-green-700 text-sm">{parseInt(item.discount)===0 ? '' : `${parseInt(item.discount)}% off`}</span>
+                <span className="text-green-700 text-sm">
+                  {parseInt(item.discount) === 0
+                    ? ""
+                    : `${parseInt(item.discount)}% off`}
+                </span>
               </span>
               <span className="flex bg-color-1 px-2 gap-1 rounded-md">
                 <FaRupeeSign className=" mt-[5px] text-sm" />
                 <span>{item.sellingPrice}</span>
               </span>
             </div>
-
-           
           </div>
         </div>
       )}
+  
     </>
   );
 };

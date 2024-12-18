@@ -10,6 +10,7 @@ import ProductCard from "@/Component/Home/productCard";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductbyId, getterFunction } from "@/Api";
 import { getCategoriesProduct } from "@/Redux/actions/productActions";
+import UserContext from "@/userContext";
 const Page = () => {
   const [product, setProduct] = useState(null);
   const [subProduct, setSubProduct] = useState([]);
@@ -17,6 +18,7 @@ const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("product");
+
 
   useEffect(() => {
     if (product) {
@@ -50,6 +52,8 @@ const dispatch = useDispatch();
       productData();
     }
   }, [id]);
+
+  
 
   return (
     <>

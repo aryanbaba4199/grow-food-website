@@ -49,7 +49,7 @@ export const productsAPi = `${apiurl}/api/products/getAllProducts`
 export const getProductbyId = `${apiurl}/api/products/product`
 export const createProduct = `${apiurl}/api/products`
 export const getProductsApi = `${apiurl}/api/products`
-export const updateProductsApi = `${apiurl}/api/products`
+export const updateProductsApi = `${apiurl}/api/products/updateProduct`
 export const deleteProductApi = `${apiurl}/api/products?id=`
 export const getBrandsProductApi = `${apiurl}/api/productsFilter/brands?brand=`
 export const getCategoriesProductApi = `${apiurl}/api/products/categoriesProduct`

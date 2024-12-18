@@ -11,8 +11,8 @@ const EditProducts = ({ product, setEditMode }) => {
 
   useEffect(() => {
     // Initialize imageFiles with the product's images
-    if (product.image) {
-      setImageFiles(product.image);
+    if (product?.image) {
+      setImageFiles(product?.image);
     }
   }, [product]);
 
@@ -27,7 +27,7 @@ const EditProducts = ({ product, setEditMode }) => {
 
   const handleSave = async () => {
     try {
-      const res = await updaterFunction(`${updateProductsApi}`, formData)
+      const res = await updaterFunction(`${updateProductsApi}`, {formData})
       
         Swal.fire({
           title: "Success",

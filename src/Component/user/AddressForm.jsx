@@ -16,7 +16,7 @@ const defaultFormData = {
   zip : '',
 }
 
-const AddressForm = ({setAddressMode, fetchAddress}) => {
+const AddressForm = ({setAddressMode}) => {
   const [formData, setFormData] = useState(defaultFormData);
   const {user} = useContext(UserContext);
 
@@ -48,6 +48,7 @@ const AddressForm = ({setAddressMode, fetchAddress}) => {
           text : 'Address Created'
         })
       }
+     
     }catch(e){
       console.error(e);
       Swal.fire({
@@ -62,7 +63,7 @@ const AddressForm = ({setAddressMode, fetchAddress}) => {
     <>
     <div className='p-8 px-16'>
       <Typography fontSize={26} fontWeight={800}>Create Address</Typography>
-      <div>
+      <div className='grid md:grid-cols-2 grid-cols-1 gap-3'>
         <div className='mt-4'>
           <TextField
           type='text'

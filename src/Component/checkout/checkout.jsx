@@ -11,6 +11,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  Dialog,
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
@@ -19,21 +20,22 @@ import axios from "axios";
 import { FaCheckDouble } from "react-icons/fa";
 import { decryptData } from "@/Context/userFunction";
 import { FaLocationPin, FaPlus } from "react-icons/fa6";
+import AddressForm from "../user/AddressForm";
 
 const Checkout = ({ products, qty, setQty, deleteCart }) => {
   const [open, setOpen] = useState(false);
   const [address, setAddress] = useState([]);
   const [addressId, setAddressId] = useState(null);
+  const [addressMode, setAddressMode] = useState(false);
   const [calculatedPrices, setCalculatedPrices] = useState([]);
   const router = useRouter();
   const { user } = useContext(UserContext);
 
   useEffect(() => {
-    if(user){
+    if (user) {
       fetchAddress();
-    } 
-    
-  }, [user]);
+    }
+  }, [user, addressMode]);
 
   useEffect(() => {
     console.log("length : ", qty);
@@ -50,6 +52,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
   const fetchAddress = async () => {
     try {
       const res = await axios.get(`${getuserAddress}/${user._id}`);
+      console.log(res);
       if (res.status === 200) {
         setAddress(res.data);
         setAddressId(res?.data[0]);
@@ -76,7 +79,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
       });
       return;
     }
-    
+
     const orderDetails = calculatedPrices.map((item) => ({
       productId: item.productId,
       vendorId: products.find((pr) => pr._id === item.productId)?.vendorId,
@@ -111,6 +114,10 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
     0
   );
 
+  const handleCreateAddress = async () => {
+    setAddressMode(true);
+  };
+
   return (
     <>
       <div className="container mx-auto p-4 mt-4">
@@ -119,7 +126,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
             <Card className="shadow-lg">
               <CardContent>
                 <p
-                  onClick={() => setOpen(true)}
+                  onClick={() => setOpen(!open)}
                   variant="h6"
                   className="bg-slate-900 hover:cursor-pointer flex justify-start gap-4 items-center text-white px-4 py-2 rounded-md"
                 >
@@ -127,7 +134,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                   <span>Change Address</span>
                 </p>
                 {open && (
-                  <div className="mt-4">
+                  <div className="mt-4 ease-in-out transition transition-all animation-spin">
                     {address.length > 0 ? (
                       address.map((item) => (
                         <div
@@ -160,23 +167,45 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                     )}
                   </div>
                 )}
-                {addressId !== null && !open && (
+                {addressId !== null && address?.length !== 0 && (
                   <div
-                    key={addressId._id}
+                    key={addressId?._id}
                     className={`border p-4 mb-2 rounded-md cursor-pointer`}
                   >
-                    <span>Name: {addressId.name}</span>
+                    <span>Name: {addressId?.name}</span>
                     <div className="flex justify-between items-center">
-                      <span>{addressId.mobile}</span>
+                      <span>{addressId?.mobile}</span>
 
                       <FaCheckDouble className="text-green-600" />
                     </div>
                     <div className="text-sm text-gray-700">
-                      {addressId.landmark}, {addressId.locality},{" "}
-                      {addressId.city}, {addressId.state} - {addressId.zip}
+                      {addressId?.landmark}, {addressId?.locality},{" "}
+                      {addressId?.city}, {addressId?.state} - {addressId?.zip}
                     </div>
                   </div>
                 )}
+                {address?.length === 0 && (
+                  <div className="flex justify-center items-center mt-8">
+                    <span
+                      className="px-4 py-2 bg-gradient-to-r from-[#15892e] rounded-md hover:cursor-pointer to-yellow-600 text-white"
+                      onClick={() => handleCreateAddress()}
+                    >
+                      Create New Address
+                    </span>
+                  </div>
+                )}
+                <>
+                  {open && (
+                    <div className="flex justify-center items-center mt-8">
+                      <span
+                        className="px-4 py-2 bg-gradient-to-r from-[#15892e] rounded-md hover:cursor-pointer to-yellow-600 text-white"
+                        onClick={() => handleCreateAddress()}
+                      >
+                        Create New Address
+                      </span>
+                    </div>
+                  )}
+                </>
               </CardContent>
             </Card>
             <Card className="mt-4">
@@ -242,7 +271,8 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                             <p
                               onClick={() => {
                                 const updatedQty = [...qty]; // Create a shallow copy of the qty array
-                                updatedQty[index] = Number(updatedQty[index]) + 1; // Increment the value at the specified index
+                                updatedQty[index] =
+                                  Number(updatedQty[index]) + 1; // Increment the value at the specified index
                                 setQty(updatedQty); // Update the state with the new array
                               }}
                               className="bg-color-1 text-white px-4 py-2 rounded-md active:bg-cyan-600 transition font-semibold cursor-pointer"
@@ -252,7 +282,6 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                           </TableCell>
                           <TableCell>{product.sellingPrice}</TableCell>
                           <TableCell>{item.totalPrice.toFixed(2)}</TableCell>
-
                         </TableRow>
                       );
                     })}
@@ -263,7 +292,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                     variant="h6"
                     className="font-semibold text-slate-900"
                   >
-                    Total Payable: {totalPayable.toFixed(2)}/-
+                    Total Payable : {totalPayable.toFixed(2)}/-
                   </Typography>
                 </div>
               </CardContent>
@@ -280,6 +309,9 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
           </button>
         </div>
       </div>
+      <Dialog open={addressMode} onClose={() => setAddressMode(false)}>
+        <AddressForm setAddressMode={setAddressMode} />
+      </Dialog>
     </>
   );
 };

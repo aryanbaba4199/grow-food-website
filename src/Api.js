@@ -24,6 +24,7 @@ export const updateUserDetails = `${apiurl}/api/users/updateUser`
 export const createAddress = `${apiurl}/api/users/createAddress`
 export const getuserAddress = `${apiurl}/api/users/getAddress`
 export const getAllUsers = `${apiurl}/api/users/getallusersforadmin`
+export const deleteAddressApi = `${apiurl}/api/users/deleteAddress`
 
  
 

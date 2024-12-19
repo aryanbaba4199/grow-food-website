@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import UserContext from "@/userContext";
 import axios from "axios";
-import { FaPlus } from "react-icons/fa6";
-import { createAddress } from "@/Api";
+import { FaDeleteLeft, FaPlus } from "react-icons/fa6";
+import { createAddress, deleteAddressApi, DeleteApi, deleteCartItem, getterFunction } from "@/Api";
 import Swal from "sweetalert2";
 import { getuserAddress } from "@/Api";
+
 import {
   TextField,
   Button,
@@ -36,7 +37,6 @@ const defaultformData = {
 
 const Profile = (setOpen) => {
   const { user } = useContext(UserContext);
-  console.log(user);
   const defaultProfileForm = {
     image: user?.image,
     tempImageUrl : user?.image,
@@ -52,6 +52,7 @@ const Profile = (setOpen) => {
   const [tempImageUrl, setTempImageUrl] = useState("");
   const [profileForm, setProfileForm] = useState(defaultProfileForm);
   const [formData, setFormData] = useState(defaultformData);
+  const [showAddress, setShowAddress] = useState(false);
  
 
   useEffect(() => {
@@ -112,11 +113,11 @@ const Profile = (setOpen) => {
 
   const getAddress = async () => {
     try {
-      const res = await axios.get(`${getuserAddress}/${user._id}`);
-      if (res.status === 200) {
+      const res = await getterFunction(`${getuserAddress}/${user._id}`);
+      if (res) {
+        console.log(res);
        
-        localStorage.setItem("userAddress", encryptData(res.data));
-        setAddress(res.data);
+        setAddress(res);
       }
     } catch (e) {
       console.error(e);
@@ -186,6 +187,27 @@ const Profile = (setOpen) => {
       deleteImageFromCloudinary(imageId);
     }
   };
+
+  const hanldeDeleteAddress = async(id)=>{
+    try{
+      const res = await DeleteApi(`${deleteAddressApi}/${id}`)
+      if(res){
+        Swal.fire({
+          title: "Success",
+          icon: "success",
+          text: "Address deleted successfully",
+        });
+        getAddress();
+      }
+    }catch(e){
+      console.error('Error in Deleting Address', e);
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        text: "Failed to delete address",
+      });
+    }
+  }
 
   return (
     <>
@@ -352,8 +374,8 @@ const Profile = (setOpen) => {
                   
                 />
               </div>
-              <div className="flex justify-between items-center mt-2 px-4 bg-color-1">
-                <span className="font font-semibold text-white">
+              <div className="flex justify-between items-center mt-2 px-4 bg-color-1 hover:cursor-pointer">
+                <span className="font font-semibold text-white" onClick={()=>setShowAddress(!showAddress)}>
                   Address : {address.length}{" "}
                 </span>
                 <FaPlus
@@ -362,9 +384,10 @@ const Profile = (setOpen) => {
                 />
               </div>
             </div>
-            <div>
+            {showAddress &&
+            <div className="flex flex-col gap-4">
               {address.map((item, index) => (
-                <div key={index} className="flex flex-col bg-gray-100 text-sm shadow-md shadow-[#1e4426] mt-2 px-4">
+                <div key={index} className="flex flex-col bg-gray-100 text-sm shadow-md  mt-2 px-4">
                   <span>Name : {item.name}</span>
                   <span>Mobile : {item.mobile}</span>
                   <div className="flex flex-wrap gap-2 flex-row mt-1 text-sm text-gray-700">
@@ -374,9 +397,14 @@ const Profile = (setOpen) => {
                     <span>{item.state}</span>
                     <span>{item.zip}</span>
                   </div>
+                  <div className="absolute right-4 text-lg text-red-600">
+                    <FaDeleteLeft className="hover:cursor-pointer" onClick={()=>hanldeDeleteAddress(item._id)}/>
+                  </div>
                 </div>
+                
               ))}
             </div>
+            }
           </div>
         </div>
       )}
@@ -459,6 +487,7 @@ const Profile = (setOpen) => {
         </div>
         </div>
       </Drawer>
+      
     </>
   );
 };

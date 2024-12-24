@@ -82,11 +82,13 @@ export const getCategories = () => async dispatch => {
 export const getUnit = ()=>async dispatch =>{
   try{
     const res = await axios.get(getUnitApi);
-    dispatch({type : GET_UNIT, payload: res.data.data});
+    dispatch({type : GET_UNIT, payload: res.data});
   }catch(err){
     console.error('Error fetching unit', err);
   };
 }
+
+
 
 export const getSubCategories = ()=>async dispatch =>{
   try{

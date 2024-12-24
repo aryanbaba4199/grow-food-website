@@ -43,6 +43,7 @@ import { useSelector } from "react-redux";
 import EditProducts from "@/Component/Admin/products/EditProducts";
 import OrdersTable from "@/Component/Admin/Dashboard/OrdersTable";
 import CreateBrand from "@/Component/Admin/createBrand";
+import CreateCategory from "@/Component/Admin/createCategory/createCategory";
 
 // Dummy data for Recharts
 const lineChartData = [
@@ -122,6 +123,7 @@ const Page = () => {
 
   
   const [orders, setOrders] = useState([]);
+  const [totalOrder, setTotalOrders] = useState(null);
   const [products, setProducts] = useState([]);
   
   const [editProduct, setEditProduct] = useState(null);
@@ -129,7 +131,7 @@ const Page = () => {
 
   const getProducts = async()=>{
     if(user.userType==='Vendor'){
-      const y = x.filter(
+      const y = x&& x.filter(
         (item) => item.vendorId === user._id
       );
       setProducts(y);
@@ -152,11 +154,12 @@ const Page = () => {
         const res = await getterFunction(`${adminOrders}?id=${id}&&pageNum=${1}`);
       
        setOrders(res.orders);
+       setTotalOrders(res.totalOrders);
       }else if(user.userType==='Vendor'){
        
-      const res = await getterFunction(`${vendorOrdersApi}?id=${id}&&pageNum=${1}`);
-  
-      setOrders('order have',res.data);
+      const res = await getterFunction(`${vendorOrdersApi}/${user._id}`);
+      setTotalOrders(res.totalOrders);  
+      setOrders(res);
       }
     } catch (error) {
       setOrders([]);
@@ -317,15 +320,16 @@ const Page = () => {
               <div className="flex justify-start  items-center">
                 <Typography variant="h6" className="mb-4">
                   {" "}
-                  Orders{" "}
+                  Orders : {totalOrder}
                 </Typography>
+                
                 <p>{orders.totalOrders}</p>
                 
               </div>
 
              <OrdersTable orders={orders}/>
             </div>
-            {products?.length !== 0 && (
+            
               <div className="bg-white p-4 rounded-md shadow-md">
                 <div className="flex justify-between  items-center">
                   <Typography variant="h6" className="mb-4">
@@ -340,7 +344,7 @@ const Page = () => {
                     Product
                   </Link>
                 </div>
-
+                {products?.length !== 0 && (
                 <TableContainer component={Paper}>
                   <Table>
                     <TableHead>
@@ -405,10 +409,18 @@ const Page = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+                  )}
               </div>
-            )}
+          
             <div>
-              <CreateBrand/>
+              {user?.userType==='admin' &&
+              <CreateBrand user = {user?.userType}/>
+                }
+            </div>
+            <div className="mt-8">
+            {user?.userType==='admin' &&
+              <CreateCategory/>
+            }
             </div>
           </div>
 

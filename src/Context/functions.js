@@ -45,7 +45,7 @@ export const uploadImageToCloudinary = async (image) => {
   try {
     // Compress the image
     const compressedImage = await compressImage(image);
-
+    console.log(cloudinaryName, cloudinaryPreset);
     const formData = new FormData();
     formData.append("file", compressedImage);
     formData.append("upload_preset", cloudinaryPreset);

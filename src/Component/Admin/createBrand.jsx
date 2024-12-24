@@ -25,7 +25,7 @@ import Swal from "sweetalert2";
 import { FaPlus } from "react-icons/fa";
 import { decryptData } from "@/Context/userFunction";
 
-const CreateBrand = () => {
+const CreateBrand = ({user}) => {
   const [brandName, setBrandName] = useState("");
   const [icon, setIcon] = useState(null);
   const [iconURL, setIconURL] = useState("");
@@ -267,7 +267,7 @@ const CreateBrand = () => {
               <Button onClick={handleUpdate} color="primary">
                 Update
               </Button>
-              
+              {user==='admin' &&
                 <Button
                   onClick={() => {
                     handleDelete();
@@ -276,7 +276,7 @@ const CreateBrand = () => {
                 >
                   Delete
                 </Button>
-            
+              }
             </>
           ) : (
             <Button onClick={handleImageUpload} color="primary">

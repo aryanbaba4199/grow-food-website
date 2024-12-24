@@ -31,7 +31,7 @@ const OrdersTable = ({ orders }) => {
     setSelectedOrder(null); // Clear the selected order details
     setOpen(false); // Close the dialog
   };
-
+console.log('x', orders)
 
   return (
     <>
@@ -72,7 +72,7 @@ const OrdersTable = ({ orders }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {orders.map((row, index) => (
+                  {orders?.length!==0 && orders.map((row, index) => (
                     <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell> {row.productDetails?.name} </TableCell>

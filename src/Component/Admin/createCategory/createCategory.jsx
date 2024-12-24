@@ -11,12 +11,13 @@ import {
 import axios from "axios";
 import Loader from "../../helpers/loader";
 import { API_URL } from "@/Api";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { getCategories } from "@/Redux/actions/productActions";
 import Swal from "sweetalert2";
 import { uploadImageToCloudinary, whosVisiting } from "@/Context/functions";
 import { FaPlus } from "react-icons/fa";
 import { decryptData } from "@/Context/userFunction";
+import { useDispatch, useSelector } from "react-redux";
 
 const CreateCategory = () => {
   const [categoryName, setCategoryName] = useState("");
@@ -27,15 +28,20 @@ const CreateCategory = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
 
+
+
+  const dispatch = useDispatch();
 
   const router = useRouter();
 
   useEffect(() => {
-    const x = decryptData(localStorage.getItem("categories"));
-    setCategories(x);
+    dispatch(getCategories());
   }, []);
+
+  const categories = useSelector((state) => state.products.categories);
+
+  console.log(categories);
 
   const handleImageUpload = async () => {
     if (!icon) return "";
@@ -57,7 +63,7 @@ const CreateCategory = () => {
 
     try {
       const uploadedUrl = await handleImageUpload();
-      const res = await axios.post(`${API_URL}/products/createCategory`, {
+      const res = await axios.post(`${API_URL}/api/products/createCategory`, {
         name: categoryName,
         icon: uploadedUrl,
       });
@@ -175,7 +181,7 @@ const CreateCategory = () => {
           </p>
         </Typography>
         <div className="flex flex-wrap justify-between gap-4 items-center mt-8">
-          {categories.map((item, index) => (
+          {categories && categories.map((item, index) => (
             <div
               key={index}
               className="w-32 h-28 flex-1 pt-2 border shadow-md shadow-black flex flex-col justify-center items-center cursor-pointer"
@@ -228,12 +234,12 @@ const CreateCategory = () => {
               <Button onClick={handleUpdate} color="info">
                 Update
               </Button>
-              {decryptData(localStorage.getItem("user")).user.userType ===
-                "Admin" && 
+              
+
               <Button onClick={handleDelete} color="error">
                 Delete
               </Button>
-}
+
             </>
           ) : (
             <Button onClick={handleSubmit} color="primary">

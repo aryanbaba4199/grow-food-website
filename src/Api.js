@@ -61,20 +61,20 @@ export const bulkUploadApi = `${apiurl}/api/products/products/bulkCreate`
 
 // ---------------Brands Api ---------------------------
 export const updateBrandbyId = `${apiurl}/api/products/updateBrand`
-export const deleteBrandbyId = `${apiurl}/api/brands?id=`
+export const deleteBrandbyId = `${apiurl}/api/products/deleteBrand`
 export const getBrandsApi = `${apiurl}/api/products/brands`
-export const createUnit = `${apiurl}/api/unit`
-export const getUnitApi = `${apiurl}/api/unit`
+export const createUnit = `${apiurl}/api/products/createUnit`
+export const getUnitApi = `${apiurl}/api/products/getUnit`
 
 export const getProductbySubCategory = `${apiurl}/api/products/subProduct`
 
 
-export const subCategoryAPI = `/api/subCategory`
+export const subCategoryAPI = `/api/products/subCategory`
 
 //------------Categories------------
 export const categoryApi = `${apiurl}/api/products/category`
-export const getSubCategoriesApi = `${apiurl}/api/subCategory`
-export const createSubCategory = `${apiurl}/api/subCategory`
+export const getSubCategoriesApi = `${apiurl}/api/products/getSubCategory`
+export const createSubCategory = `${apiurl}/api/products/createSubCategory`
 
 
 //vendors Api

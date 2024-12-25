@@ -44,8 +44,10 @@ const CreateBrand = ({user}) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (iconURL !== "") {
+    if (iconURL !== "" && !editMode) {
       handleSubmit();
+    }else if(iconURL !=="" && editMode){
+      handleUpdate();
     }
   }, [iconURL]);
 
@@ -151,15 +153,20 @@ const CreateBrand = ({user}) => {
   };
 
   const handleUpdate = async () => {
-
+    if(user!==admin){
+      return;
+    }
     if (!selectedBrand) return;
     setLoader(true);
-    const imageUpload = await handleImageUpload().then(async()=>{
+    
+    
       try {
+        console.log('upload', updateBrandbyId)
         const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
           name: brandName,
           icon: iconURL ? iconURL : selectedBrand.icon,
         });
+        
   
         if (res.status === 200) {
           Swal.fire({
@@ -186,7 +193,7 @@ const CreateBrand = ({user}) => {
       } finally {
         setLoader(false);
       }
-    });
+   
     
   };
 
@@ -237,7 +244,7 @@ const CreateBrand = ({user}) => {
           ))}
         </div>
       </div>
-
+      
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{editMode ? "Edit Brand" : "Create Brand"}</DialogTitle>
         <DialogContent>
@@ -264,7 +271,7 @@ const CreateBrand = ({user}) => {
           </Button>
           {editMode ? (
             <>
-              <Button onClick={handleUpdate} color="primary">
+              <Button onClick={handleImageUpload} color="primary">
                 Update
               </Button>
               {user==='admin' &&

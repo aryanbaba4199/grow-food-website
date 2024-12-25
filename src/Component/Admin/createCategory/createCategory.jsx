@@ -19,7 +19,7 @@ import { FaPlus } from "react-icons/fa";
 import { decryptData } from "@/Context/userFunction";
 import { useDispatch, useSelector } from "react-redux";
 
-const CreateCategory = () => {
+const CreateCategory = ({user}) => {
   const [categoryName, setCategoryName] = useState("");
   const [icon, setIcon] = useState(null);
   const [iconURL, setIconURL] = useState("");
@@ -157,6 +157,9 @@ const CreateCategory = () => {
   };
 
   const handleEdit = (category) => {
+    if(user!=='admin'){
+      return;
+    }
     setSelectedCategory(category);
     setCategoryName(category.name);
     setIconURL(category.icon);
@@ -229,7 +232,7 @@ const CreateCategory = () => {
           <Button onClick={resetForm} color="secondary">
             Close
           </Button>
-          {editMode ? (
+          {user ==='admin' && editMode ? (
             <>
               <Button onClick={handleUpdate} color="info">
                 Update

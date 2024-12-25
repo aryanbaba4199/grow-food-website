@@ -413,14 +413,14 @@ const Page = () => {
               </div>
           
             <div>
-              {user?.userType==='admin' &&
+             
               <CreateBrand user = {user?.userType}/>
-                }
+                
             </div>
             <div className="mt-8">
-            {user?.userType==='admin' &&
-              <CreateCategory/>
-            }
+            
+              <CreateCategory user={user?.userType}/>
+            
             </div>
           </div>
 

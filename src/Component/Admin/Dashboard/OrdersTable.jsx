@@ -31,65 +31,46 @@ const OrdersTable = ({ orders }) => {
     setSelectedOrder(null); // Clear the selected order details
     setOpen(false); // Close the dialog
   };
-console.log('x', orders)
+
+  console.log(selectedOrder)
 
   return (
     <>
       {orders && (
         <div>
-          {orders.length !==0 && (
+          {orders.length !== 0 && (
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>
-                      <strong>SN</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Brand</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Qty</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Price</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Order Amount</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Payment ID</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Client Name</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>Action</strong>
-                    </TableCell>
+                    <TableCell><strong>SN</strong></TableCell>
+                    <TableCell><strong>Name</strong></TableCell>
+                    <TableCell><strong>Brand</strong></TableCell>
+                    <TableCell><strong>Qty</strong></TableCell>
+                    <TableCell><strong>Price</strong></TableCell>
+                    <TableCell><strong>Order Amount</strong></TableCell>
+                    <TableCell><strong>Action</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {orders?.length!==0 && orders.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell> {row.productDetails?.name} </TableCell>
-                      <TableCell> {row.productDetails?.brand} </TableCell>
-                      <TableCell> {row.quantity} </TableCell>
-                      <TableCell> {row.productDetails?.sellingPrice} </TableCell>
-                      <TableCell> {row.orderAmount} </TableCell>
-                      <TableCell> {row.paymentId} </TableCell>
-                      <TableCell> {row.address[0]?.name} </TableCell>
-                      <TableCell>
-                        <FaEye
-                          className="text-lg text-[#15892e] cursor-pointer"
-                          onClick={() => handleDialogOpen(row)}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {orders.map((row, orderIndex) =>
+                    row.productDetails.map((product, productIndex) => (
+                      <TableRow key={`${orderIndex}-${productIndex}`}>
+                        <TableCell>{orderIndex + 1}</TableCell>
+                        <TableCell>{product.name}</TableCell>
+                        <TableCell>{product.brand}</TableCell>
+                        <TableCell>{product.quantity}</TableCell>
+                        <TableCell>{product.price}</TableCell>
+                        <TableCell>{product.totalPrice}</TableCell>
+                        <TableCell>
+                          <FaEye
+                            className="text-lg text-[#15892e] cursor-pointer"
+                            onClick={() => handleDialogOpen(row)}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -113,45 +94,43 @@ console.log('x', orders)
             <DialogContent>
               {selectedOrder && (
                 <div>
-                  <Card elevation={4} className="px-8 py-1 m-2">
-                    <p className=" flex gap-2 items-center font-semibold text-[#15892e]">
-                      <MdProductionQuantityLimits className="text-lg font-bold bg-green-300 w-6 rounded-full p-1 h-6" />
-                      Product Details
-                    </p>
-                    <p>
-                      <strong>Product Name:</strong>{" "}
-                      {selectedOrder.productDetails?.name}
-                    </p>
-                    <p>
-                      <strong>Category :</strong>{" "}
-                      {selectedOrder.productDetails?.categories}
-                    </p>
-                    <p>
-                      <strong>Brand:</strong>{" "}
-                      {selectedOrder.productDetails?.brand}
-                    </p>
-                    <p>
-                      <strong>Discount :</strong>{" "}
-                      {selectedOrder.productDetails?.discount}{" "}
-                      {selectedOrder.productDetails?.discountType}
-                    </p>
-
-                    <p>
-                      <strong>Price:</strong>{" "}
-                      {selectedOrder.productDetails?.price}
-                    </p>
-                    <p>
-                      <strong>Price:</strong>{" "}
-                      {selectedOrder.productDetails?.sellingPrice}
-                    </p>
+                  {selectedOrder.productDetails.map((product, index) => (
+                    <Card key={index} elevation={4} className="px-8 py-1 m-2">
+                      <p className=" flex gap-2 items-center font-semibold text-[#15892e]">
+                        <MdProductionQuantityLimits className="text-lg font-bold bg-green-300 w-6 rounded-full p-1 h-6" />
+                        Product Details
+                      </p>
+                      <p>
+                        <strong>Product Name:</strong> {product.name}
+                      </p>
+                      <p>
+                        <strong>Category :</strong> {product.category}
+                      </p>
+                      <p>
+                        <strong>Brand:</strong> {product.brand}
+                      </p>
+                      <p>
+                        <strong>Discount :</strong> {product.discount}{" "}
+                        {product.discountType}
+                      </p>
+                      <p>
+                        <strong>Price:</strong> {product.price}
+                      </p>
+                      {/* <p>
+                        <strong>Quantity :</strong> {selectedOrder.productQty}
+                      </p> */}
+                      <p>
+                        <strong>Selling Price:</strong> {product.sellingPrice}
+                      </p>
                     </Card>
+                  ))}
 
-                    <Card elevation={4} className="px-8 py-1 m-2 my-4">
+                  <Card elevation={4} className="px-8 py-1 m-2 my-4">
                     <p className=" flex gap-2 items-center font-semibold text-[#15892e]">
                       <MdLocationOn className="text-lg font-bold bg-green-300 w-6 rounded-full p-1 h-6" />
                       Delivery Details
                     </p>
-                    <p>
+                    {/* <p>
                       <strong>Client Name:</strong>{" "}
                       {selectedOrder.address[0]?.name}
                     </p>
@@ -162,7 +141,7 @@ console.log('x', orders)
                     <p>
                       <strong>Client Address:</strong>{" "}
                       {`${selectedOrder.address[0]?.locality}, ${selectedOrder.address[0]?.city}, ${selectedOrder.address[0]?.state}, ${selectedOrder.address[0]?.zip}`}
-                    </p>
+                    </p> */}
                   </Card>
                   <Card elevation={4} className="px-8 py-1 m-2 my-4">
                     <p className=" flex gap-2 items-center font-semibold text-[#15892e]">
@@ -177,10 +156,11 @@ console.log('x', orders)
                       <strong>Payment ID :</strong> {selectedOrder.paymentId}
                     </p>
                     <p>
-                      <strong>Order Quantity :</strong> {selectedOrder.quantity}
+                      <strong>Order Quantity :</strong>{" "}
+                      {selectedOrder.productQty}
                     </p>
                     <p>
-                      <strong>Order Amount :</strong> {selectedOrder.quantity}
+                      <strong>Order Amount :</strong> {selectedOrder.venOrderAmount}
                     </p>
                     <p>
                       <strong>Order Date:</strong>{" "}
@@ -188,14 +168,14 @@ console.log('x', orders)
                     </p>
                     <p>
                       <strong>Order Status :</strong>{" "}
-                      {selectedOrder?.orderStatus}
+                      {selectedOrder?.status.toUpperCase()}
                     </p>
                   </Card>
                 </div>
               )}
             </DialogContent>
             <DialogActions>
-            <Button onClick={handleDialogClose} color="primary">
+              <Button onClick={handleDialogClose} color="primary">
                 Close
               </Button>
               <Button onClick={handleDialogClose} color="primary">

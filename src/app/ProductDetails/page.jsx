@@ -40,7 +40,7 @@ const dispatch = useDispatch();
   const productData = async () => {
     try {
       const data = await getterFunction(`${getProductbyId}/${id}`);
-      console.log("product data", data);
+   
       setProduct(data);
     } catch (e) {
       console.error("Error in loading product", e);

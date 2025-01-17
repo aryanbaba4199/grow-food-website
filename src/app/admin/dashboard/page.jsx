@@ -128,30 +128,21 @@ const Page = () => {
   
   const [editProduct, setEditProduct] = useState(null);
   const x = useSelector((state) => state.products.products.data)
+  console.log('x have',x);
 
-  const getProducts = async()=>{
-    if(user.userType==='Vendor'){
-      const y = x&& x.filter(
-        (item) => item.vendorId === user._id
-      );
-      setProducts(y);
-    }else if(user.userType==='admin'){
-      
-      setProducts(x);
-    }
-  }
+
 
   useEffect(() => {
-    if (user) {
+    if (user && x) {
       vendorOrder(user._id);
-      getProducts();
+      getProducts(user._id);
     }
-  }, [user]);
+  }, [user, x]);
   const vendorOrder = async (id) => {
    
     try {
       if(user.userType==='admin'){
-        const res = await getterFunction(`${adminOrders}?id=${id}&&pageNum=${1}`);
+        const res = await getterFunction(`${adminOrders}/id=${id}/pageNum=${1}`);
       
        setOrders(res.orders);
        setTotalOrders(res.totalOrders);
@@ -166,8 +157,24 @@ const Page = () => {
       console.error('Error in getting admin orders')
     }
   };
+  const getProducts = async(id)=>{
+    console.log('type is',user.userType)
+    console.log('id is',id)
+    if(user.userType==='Vendor'){
+      console.log('product',user.userType)
+      const y = await x.filter(
+        (item) => item.vendorId === id
+      );
+      console.log('y have', y)
+      setProducts(y);
+    }else if(user.userType==='admin'){
+      console.log('y have', x)
+      console.log('product',user.userType)
+      setProducts(x);
+    }
+  }
 
-
+  console.log(products)
 
   const cardData = products && [
     {

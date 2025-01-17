@@ -30,6 +30,8 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
   const router = useRouter();
   const { user } = useContext(UserContext);
 
+  
+
   useEffect(() => {
     if (user) {
       fetchAddress();
@@ -37,7 +39,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
   }, [user, addressMode]);
 
   useEffect(() => {
-    if (products.length > 0 && qty.length > 0) {
+    if (products?.length > 0 && qty?.length > 0) {
       const newCalculatedPrices = products.map((item, index) => {
         const quantity = qty[index];
         const totalPrice = quantity * item.sellingPrice;
@@ -100,7 +102,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
       date: new Date(),
     };
 
-    console.log(orderDetails);
+    console.log(calculatedPrices);
 
     try {
       const res = await axios.post(createOrderAPI, { formData: orderDetails });

@@ -130,7 +130,8 @@ const Details = ({ productData }) => {
   const handleBuyNow = () => {
     if (token !== "") {
       setCheckoutProduct([product]);
-      setEmail(user?.user?.email);
+      setEmail(user?.email);
+      console.log('email is ', user?.email);
       localStorage.setItem("products", JSON.stringify([product]));
       localStorage.setItem("qty", JSON.stringify([qty]));
       localStorage.setItem("route", "buy");

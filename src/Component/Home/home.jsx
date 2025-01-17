@@ -75,6 +75,7 @@ const Home = () => {
                       products={categories}
                       title="Shop By Categories"
                       timer={24}
+                      path={"categories"}
                       filter={handleCategoryFilter}
                     />
                   </div>
@@ -116,11 +117,7 @@ const Home = () => {
                             <div
                               className="flex-1"
                               key={index}
-                              onClick={() => {
-                                router.push(
-                                  `/ProductDetails?product=${item._id}`
-                                );
-                              }}
+                              
                             >
                               <ProductCard
                                 key={index}

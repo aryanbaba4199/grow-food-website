@@ -6,7 +6,9 @@ const initialState = {
   products: [],
   brands: [],
   categories: [],
-  units : []
+  units : [],
+  brandsProduct: [],
+  categoryProduct : [],
 };
 
 const productReducer = (state = initialState, action) => {

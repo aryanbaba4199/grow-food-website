@@ -73,7 +73,7 @@ const CreateBrand = ({user}) => {
     setLoader(true);
     try {
       const res = await axios.post(`${API_URL}/api/products/createBrand`, {
-        name: brandName,
+        name: brandName.toLowerCase(),
         icon: iconURL,
       });
 
@@ -153,7 +153,7 @@ const CreateBrand = ({user}) => {
   };
 
   const handleUpdate = async () => {
-    if(user!==admin){
+    if(user!=='admin'){
       return;
     }
     if (!selectedBrand) return;
@@ -163,7 +163,7 @@ const CreateBrand = ({user}) => {
       try {
         console.log('upload', updateBrandbyId)
         const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
-          name: brandName,
+          name: brandName.toLowerCase(),
           icon: iconURL ? iconURL : selectedBrand.icon,
         });
         
@@ -205,6 +205,14 @@ const CreateBrand = ({user}) => {
     setIconURL("");
     setTempIconURL("");
   };
+
+  const handleUpdateClick = ()=>{
+    if(icon){
+      handleImageUpload();
+    }else{
+      handleUpdate();
+    }
+  }
 
   return (
     <div>
@@ -271,7 +279,7 @@ const CreateBrand = ({user}) => {
           </Button>
           {editMode ? (
             <>
-              <Button onClick={handleImageUpload} color="primary">
+              <Button onClick={handleUpdateClick} color="primary">
                 Update
               </Button>
               {user==='admin' &&

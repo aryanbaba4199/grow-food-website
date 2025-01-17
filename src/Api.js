@@ -31,7 +31,8 @@ export const deleteAddressApi = `${apiurl}/api/users/deleteAddress`
 // -------Orders API --------------------------------
 export const OrdersApi = `${apiurl}/api/orders`
 export const createOrderAPI = `${apiurl}/api/orders/create`
-export const getOrdersByUser = `${apiurl}/api/orders/getOrder`
+export const getOrdersByUser = `${apiurl}/api/orders/getOrders`
+export const getOrderApi = `${apiurl}/api/orders/getOrder`
 export const updateOrderbyId = `${apiurl}/api/orders/updateOrder`
 export const deleteOrderbyId = `${apiurl}/api/orders/deleteOrder`
 
@@ -52,7 +53,7 @@ export const createProduct = `${apiurl}/api/products`
 export const getProductsApi = `${apiurl}/api/products`
 export const updateProductsApi = `${apiurl}/api/products/updateProduct`
 export const deleteProductApi = `${apiurl}/api/products?id=`
-export const getBrandsProductApi = `${apiurl}/api/productsFilter/brands?brand=`
+export const getBrandsProductApi = `${apiurl}/api/products/brandsProduct`
 export const getCategoriesProductApi = `${apiurl}/api/products/categoriesProduct`
 export const searchProductsApi = `${apiurl}/api/products/search/searchInDatabase`
 export const bulkUploadApi = `${apiurl}/api/products/products/bulkCreate`

@@ -1,18 +1,19 @@
-'use client'
+"use client";
 
 import React, { useEffect, useState, useRef, useContext } from "react";
 import axios from "axios";
-import ProductCard from "@/Component/Home/productCard";
 import Swal from "sweetalert2";
-import Loader from "@/Component/helpers/loader";
 import { useRouter } from "next/navigation";
-import { Button, Dialog } from "@mui/material";
+import { Button, Dialog, Typography, IconButton, Card } from "@mui/material";
 import Checkout from "@/Component/Checkout/checkout";
 import { encryptData } from "@/Context/userFunction";
 import Head from "next/head";
 import { useSelector } from "react-redux";
 import UserContext from "@/userContext";
-import { cartApi, getProductbyId } from "@/Api";
+import { cartApi, deleteCartItem, getProductbyId } from "@/Api";
+import { FaMinus, FaPlus } from "react-icons/fa";
+import Loader from "@/Component/helpers/loader";
+import { Add, Remove } from "@mui/icons-material";
 
 const Page = () => {
   const [PageData, setPageData] = useState([]);
@@ -21,6 +22,7 @@ const Page = () => {
   const [loader, setLoader] = useState(false);
   const [open, setOpen] = useState(false);
   const [qty, setQty] = useState([]); // Define the state for qty
+  const [totalCost, setTotalCost] = useState(0); // To hold the total cost
   const ref = useRef(false);
   const router = useRouter();
 
@@ -38,10 +40,9 @@ const Page = () => {
   }, [user]);
 
   const getPageData = async (id) => {
-    console.log("Getting cart data", id);
     setLoader(true);
     try {
-      const res = await axios.get(`${cartApi}/${id}`); // Use appropriate endpoint
+      const res = await axios.get(`${cartApi}/${id}`);
       if (res.status === 200) {
         const groupedProducts = res.data.reduce((acc, item) => {
           if (!acc[item.productId]) {
@@ -54,7 +55,7 @@ const Page = () => {
 
         const productIds = Object.keys(groupedProducts);
         setUserPageIds(Object.values(groupedProducts));
-        setQty(Object.values(groupedProducts).map((item) => item.qty)); // Set qty for each product
+        setQty(Object.values(groupedProducts).map((item) => item.qty));
         getProductsfromId(productIds);
       }
       setLoader(false);
@@ -94,7 +95,7 @@ const Page = () => {
   const deletePage = async (id) => {
     setLoader(true);
     try {
-      const res = await axios.delete(`/deleteCartItem/${id}`); // Use appropriate endpoint
+      const res = await axios.delete(`${deleteCartItem}/${id}`);
       if (res.status === 200) {
         Swal.fire({
           title: "Deleted",
@@ -109,9 +110,59 @@ const Page = () => {
     }
   };
 
+  const handleQtyChange = (productId, increment) => {
+    const updatedQty = qty.map((quantity, index) =>
+      userPageIds[index].productId === productId
+        ? increment
+          ? quantity + 1
+          : quantity - 1
+        : quantity
+    );
+    setQty(updatedQty);
+    updateProductQty(productId, increment);
+  };
+
+  const updateProductQty = async (productId, increment) => {
+    const updatedData = userPageIds.find(
+      (item) => item.productId === productId
+    );
+    updatedData.qty = increment ? updatedData.qty + 1 : updatedData.qty - 1;
+
+    try {
+      await axios.put(`${cartApi}/update/${productId}`, updatedData); // Assuming you have an endpoint to update qty
+      getPageData(user._id); // Refresh the cart data after updating qty
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const calculateTotal = () => {
+    let total = 0;
+    PageData.forEach((item, index) => {
+      total += parseInt(item.sellingPrice * qty[index]);
+    });
+    total += 30; // Adding the delivery charge
+    setTotalCost(total);
+  };
+
   const handleCheckoutAll = () => {
+    if(totalCost<2000){
+      Swal.fire({
+        title: "Warning",
+        icon: "warning",
+        text: "Total cost is less than 2000. add more other wise delivery charges will affect",
+        confirmButtonText: "Proceed",
+      })
+      return;
+    }
     if (PageData.length > 0) {
-      setOpen(true);
+      localStorage.removeItem('route');
+            localStorage.removeItem('products');
+            localStorage.removeItem('qty');
+      localStorage.setItem("products", JSON.stringify(PageData));
+      localStorage.setItem("qty", JSON.stringify(qty));
+      localStorage.setItem("route", "cart");
+      router.push('/checkout')
     } else {
       Swal.fire({
         title: "No Items",
@@ -120,6 +171,10 @@ const Page = () => {
       });
     }
   };
+
+  useEffect(() => {
+    calculateTotal();
+  }, [qty, PageData]);
 
   return (
     <>
@@ -145,30 +200,41 @@ const Page = () => {
               <p>No Cart Item Found</p>
             </div>
           )}
-          <div className="md:flex grid grid-cols-2 md:mt-2 mt-14 flex-row gap-4 flex-wrap justify-between w-fit px-4">
+          <div className="md:flex grid grid-cols-2 md:mt-2 mt-14 flex-col gap-4 flex-wrap justify-between w-fit px-4">
             {PageData.map((item, index) => (
-              <div key={item._id}>
-                <div
-                  onClick={() => {
-                    const id = encryptData(item._id);
-                    router.push(
-                      `/ProductDetails?thegrowfood=${encodeURIComponent(id)}`
-                    );
-                  }}
-                >
-                  <ProductCard
-                    item={item}
-                    key={index}
-                    qty={
-                      userPageIds.find((Page) => Page.productId === item._id)
-                        ?.qty
-                    }
-                  />
+              <Card key={item._id} className="flex flex-row gap-8 p-2">
+                <div>
+                  <img src={item.image[0]} className="w-52 h-32 rounded-md" />
                 </div>
-                <div className="flex justify-between items-center mt-1">
-                  <span className="txt-1">
-                    Quantity : {userPageIds[index]?.qty}
-                  </span>
+                <div className="w-full">
+                  <Typography>{item.name}</Typography>
+                  <Typography>Price: ₹ {item.sellingPrice}</Typography>
+                  <Typography>Brand: {item.brand.toUpperCase()}</Typography>
+                  <Typography className="font-semibold">
+                    Total: ₹ {(item.sellingPrice * qty[index]).toFixed(2)}
+                  </Typography>
+                </div>
+
+                <div className="flex flex-col justify-between items-end mt-1">
+                  <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center px-4 border-[2px] border-gray-200 rounded-md gap-8 p-1">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleQtyChange(item._id, false)}
+                      >
+                        <Remove />
+                      </IconButton>
+                      <Typography>{qty[index]}</Typography>
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleQtyChange(item._id, true)}
+                      >
+                        <Add />
+                      </IconButton>
+                    </div>
+                  </div>
                   <Button
                     variant="contained"
                     color="warning"
@@ -183,28 +249,30 @@ const Page = () => {
                     Remove
                   </Button>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
           {userId !== "" && PageData.length > 0 && (
-            <div className="flex justify-center mt-4">
-              <button
+            <div className="flex justify-center items-center mt-4 px-4 flex-col mb-8">
+              <div className="justify-end flex flex-col items-end gap-2 mb-4">
+                <span className="font-semibold text-gray-700">Subtotal : ₹ {totalCost-30}</span>
+                <span className="text-gray-700 font-semibold">Delivery Charge: Free</span>
+                <span className="font-bold text-slate-950 text-lg">Total: ₹ {totalCost}</span>
+              </div>
+              <div className="flex justify-end items-end">
+              <Button
+                variant="outlined"
                 onClick={handleCheckoutAll}
-                className="bg-color-1 text-white px-4 py-2 rounded-md font-semibold"
+                className={`text-[#15892e] ${totalCost<2000 && "bg-red-600 text-white"}   border-green-700 px-4 py-2 rounded-md font-semibold`}
               >
-                Checkout All
-              </button>
+                Checkout
+              </Button>
+              </div>
             </div>
           )}
         </div>
       )}
-      <Dialog open={open} fullScreen>
-        <Checkout
-          products={PageData}
-          setCopen={setOpen}
-          qty={qty} // Pass qty to Checkout
-        />
-      </Dialog>
+     
     </>
   );
 };

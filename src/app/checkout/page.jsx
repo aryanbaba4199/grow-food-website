@@ -12,6 +12,9 @@ const Page = () => {
         console.log(productData, qty, routeFrom);
         if(routeFrom==='buy'){
             setProducts(JSON.parse(productData));
+            localStorage.removeItem('route');
+            localStorage.removeItem('products');
+            localStorage.removeItem('qty');
         }else{
             setProducts(JSON.parse(productData));
         }

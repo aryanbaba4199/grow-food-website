@@ -15,12 +15,10 @@ import {
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
-import { IoMdCloseCircle } from "react-icons/io";
-import axios from "axios";
 import { FaCheckDouble } from "react-icons/fa";
-import { decryptData } from "@/Context/userFunction";
-import { FaLocationPin, FaPlus } from "react-icons/fa6";
+import { FaLocationPin } from "react-icons/fa6";
 import AddressForm from "../user/AddressForm";
+import axios from "axios";
 
 const Checkout = ({ products, qty, setQty, deleteCart }) => {
   const [open, setOpen] = useState(false);
@@ -28,6 +26,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
   const [addressId, setAddressId] = useState(null);
   const [addressMode, setAddressMode] = useState(false);
   const [calculatedPrices, setCalculatedPrices] = useState([]);
+  const [totalPayable, setTotalPayable] = useState(0); // Ensure totalPayable is defined
   const router = useRouter();
   const { user } = useContext(UserContext);
 
@@ -38,21 +37,26 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
   }, [user, addressMode]);
 
   useEffect(() => {
-    console.log("length : ", qty);
     if (products.length > 0 && qty.length > 0) {
       const newCalculatedPrices = products.map((item, index) => {
-        const quantity = qty[index]; // Corresponding quantity for the product
+        const quantity = qty[index];
         const totalPrice = quantity * item.sellingPrice;
-        return { productId: item._id, quantity, totalPrice };
+        return { productId: item._id, quantity, totalPrice, image: item.image, vendorId: item.vendorId };
       });
       setCalculatedPrices(newCalculatedPrices);
+
+      // Calculate the totalPayable
+      const totalAmount = newCalculatedPrices.reduce(
+        (acc, item) => acc + item.totalPrice,
+        0
+      );
+      setTotalPayable(totalAmount);
     }
   }, [products, qty]);
 
   const fetchAddress = async () => {
     try {
       const res = await axios.get(`${getuserAddress}/${user._id}`);
-      console.log(res);
       if (res.status === 200) {
         setAddress(res.data);
         setAddressId(res?.data[0]);
@@ -71,25 +75,31 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
       });
       return;
     }
+
     if (totalPayable <= 2000) {
       Swal.fire({
         title: "Low Order Amount",
-        text: "Order Amount can not be less than 2000",
+        text: "Order Amount cannot be less than 2000",
         icon: "info",
       });
       return;
     }
 
-    const orderDetails = calculatedPrices.map((item) => ({
-      productId: item.productId,
-      vendorId: products.find((pr) => pr._id === item.productId)?.vendorId,
+    const orderDetails = {
       userId: user._id,
+      paymentMode: "COD", // As COD is selected
       addressId,
-      quantity: item.quantity,
-      paymentId: "na",
-      paymentMode: "COD",
-      orderAmount: item.totalPrice,
-    }));
+      billAmount: totalPayable,
+      productsArray: calculatedPrices.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice,
+        images: item.image[0],
+        vendorId: item.vendorId,
+      })),
+      date: new Date(),
+    };
+
     console.log(orderDetails);
 
     try {
@@ -97,22 +107,19 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
       if (res.status === 200) {
         Swal.fire("Success", "Order Created Successfully", "success");
 
-        // router.back();
         if (deleteCart) {
-          for (const item of orderDetails) {
+          for (const item of orderDetails.productsArray) {
             await deleteCart(item.productId);
           }
         }
+
+        // Redirect to a confirmation page or back to cart
+        router.push("/order-confirmation"); // Modify this route as needed
       }
     } catch (e) {
       Swal.fire("Error", e.message, "error");
     }
   };
-
-  const totalPayable = calculatedPrices.reduce(
-    (acc, item) => acc + item.totalPrice,
-    0
-  );
 
   const handleCreateAddress = async () => {
     setAddressMode(true);
@@ -134,16 +141,12 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                   <span>Change Address</span>
                 </p>
                 {open && (
-                  <div className="mt-4 ease-in-out transition transition-all animation-spin">
+                  <div className="mt-4">
                     {address.length > 0 ? (
                       address.map((item) => (
                         <div
                           key={item._id}
-                          className={`border p-4 mb-2 rounded-md cursor-pointer ${
-                            addressId === item._id
-                              ? "border-green-600"
-                              : "border-gray-300"
-                          }`}
+                          className={`border p-4 mb-2 rounded-md cursor-pointer ${addressId === item._id ? "border-green-600" : "border-gray-300"}`}
                           onClick={() => {
                             setAddressId(item);
                             setOpen(false);
@@ -157,8 +160,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                             )}
                           </div>
                           <div className="text-sm text-gray-700">
-                            {item.landmark}, {item.locality}, {item.city},{" "}
-                            {item.state} - {item.zip}
+                            {item.landmark}, {item.locality}, {item.city}, {item.state} - {item.zip}
                           </div>
                         </div>
                       ))
@@ -167,24 +169,19 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                     )}
                   </div>
                 )}
-                {addressId !== null && address?.length !== 0 && (
-                  <div
-                    key={addressId?._id}
-                    className={`border p-4 mb-2 rounded-md cursor-pointer`}
-                  >
+                {addressId !== null && address.length !== 0 && (
+                  <div className="border p-4 mb-2 rounded-md cursor-pointer">
                     <span>Name: {addressId?.name}</span>
                     <div className="flex justify-between items-center">
                       <span>{addressId?.mobile}</span>
-
                       <FaCheckDouble className="text-green-600" />
                     </div>
                     <div className="text-sm text-gray-700">
-                      {addressId?.landmark}, {addressId?.locality},{" "}
-                      {addressId?.city}, {addressId?.state} - {addressId?.zip}
+                      {addressId?.landmark}, {addressId?.locality}, {addressId?.city}, {addressId?.state} - {addressId?.zip}
                     </div>
                   </div>
                 )}
-                {address?.length === 0 && (
+                {address.length === 0 && (
                   <div className="flex justify-center items-center mt-8">
                     <span
                       className="px-4 py-2 bg-gradient-to-r from-[#15892e] rounded-md hover:cursor-pointer to-yellow-600 text-white"
@@ -194,18 +191,6 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                     </span>
                   </div>
                 )}
-                <>
-                  {open && (
-                    <div className="flex justify-center items-center mt-8">
-                      <span
-                        className="px-4 py-2 bg-gradient-to-r from-[#15892e] rounded-md hover:cursor-pointer to-yellow-600 text-white"
-                        onClick={() => handleCreateAddress()}
-                      >
-                        Create New Address
-                      </span>
-                    </div>
-                  )}
-                </>
               </CardContent>
             </Card>
             <Card className="mt-4">
@@ -237,32 +222,19 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
           <Grid item xs={12} md={6}>
             <Card className="shadow-lg">
               <CardContent>
-                <Typography
-                  variant="h6"
-                  className="bg-slate-900 text-white px-4 py-2 rounded-md"
-                >
+                <Typography variant="h6" className="bg-slate-900 text-white px-4 py-2 rounded-md">
                   Product Details
                 </Typography>
                 <Table className="mt-4">
                   <TableBody>
                     <TableRow>
-                      <TableCell>
-                        <strong>Product Name</strong>
-                      </TableCell>
-                      <TableCell className="flex justify-center items-center gap-1">
-                        <strong>Quantity</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>Rate</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>Total</strong>
-                      </TableCell>
+                      <TableCell><strong>Product Name</strong></TableCell>
+                      <TableCell className="flex justify-center items-center gap-1"><strong>Quantity</strong></TableCell>
+                      <TableCell><strong>Rate</strong></TableCell>
+                      <TableCell><strong>Total</strong></TableCell>
                     </TableRow>
                     {calculatedPrices.map((item, index) => {
-                      const product = products.find(
-                        (prod) => prod._id === item.productId
-                      );
+                      const product = products.find(prod => prod._id === item.productId);
                       return (
                         <TableRow key={item.productId}>
                           <TableCell>{product.name}</TableCell>
@@ -270,10 +242,9 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                             {item.quantity}
                             <p
                               onClick={() => {
-                                const updatedQty = [...qty]; // Create a shallow copy of the qty array
-                                updatedQty[index] =
-                                  Number(updatedQty[index]) + 1; // Increment the value at the specified index
-                                setQty(updatedQty); // Update the state with the new array
+                                const updatedQty = [...qty];
+                                updatedQty[index] = Number(updatedQty[index]) + 1;
+                                setQty(updatedQty);
                               }}
                               className="bg-color-1 text-white px-4 py-2 rounded-md active:bg-cyan-600 transition font-semibold cursor-pointer"
                             >
@@ -288,10 +259,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
                   </TableBody>
                 </Table>
                 <div className="mt-4 text-right">
-                  <Typography
-                    variant="h6"
-                    className="font-semibold text-slate-900"
-                  >
+                  <Typography variant="h6" className="font-semibold text-slate-900">
                     Total Payable : {totalPayable.toFixed(2)}/-
                   </Typography>
                 </div>
@@ -309,6 +277,7 @@ const Checkout = ({ products, qty, setQty, deleteCart }) => {
           </button>
         </div>
       </div>
+
       <Dialog open={addressMode} onClose={() => setAddressMode(false)}>
         <AddressForm setAddressMode={setAddressMode} />
       </Dialog>

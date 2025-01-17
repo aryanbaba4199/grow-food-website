@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { FaRupeeSign } from "react-icons/fa";
+import { FaPlus, FaRupeeSign } from "react-icons/fa";
 import {
   Button,
   Dialog,
@@ -12,12 +12,15 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import UserContext from "@/userContext";
 import EditProducts from "../Admin/products/EditProducts";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { createCartApi } from "@/Api";
 
 const ProductCard = ({ item, index }) => {
   const { user } = useContext(UserContext);
-
-
-  
+  const [loader, setLoader] = useState(false);
+  const router = useRouter();
 
   const responsive = {
     superLargeDesktop: {
@@ -38,6 +41,40 @@ const ProductCard = ({ item, index }) => {
     },
   };
 
+  const handleAddtoCart = async(item) => {
+    setLoader(item._id)
+    if(!user._id){
+      Swal.fire({
+        title: "Login Required",
+        text: "You must be logged in to add products to cart",
+        icon: "warning",
+      })
+      return;
+    }
+    try{
+      const formData = {
+        userId: user._id,
+        productId: item._id,
+        qty: 1,
+      }
+      const res = await axios.post(createCartApi, formData)
+      if(res.status===200){
+        Swal.fire({
+          title: "Success",
+          text: "Product added to cart successfully",
+          icon: "success",
+        });
+      }
+    }catch(e){
+      Swal.fire({
+        title: "Error",
+        text: e.message,
+        icon: "error",
+      });
+      console.error('Error in adding to cart', e)
+    }
+  }
+
   return (
     <>
       {item.length == 0 ? (
@@ -49,7 +86,6 @@ const ProductCard = ({ item, index }) => {
           key={index}
           className="md:w-60 w-auto h-56 px-2 flex-1 border bg-gray-100 rounded-md flex flex-col pt-2 justify-center items-center cursor-pointer shadow-sm shadow-black hover:shadow-black hover:shadow-md"
         >
-          
           <div className="w-full flex-1 justify-center items-center flex flex-col hover:scale-105 hover:ease-in-out hover:transition-all">
             <Carousel
               className="w-full h-auto"
@@ -62,6 +98,7 @@ const ProductCard = ({ item, index }) => {
               keyBoardControl={true}
               arrows={false}
               transitionDuration={700}
+              
               dotListClass="custom-dot-list-style"
             >
               {(item.image.length === 0
@@ -72,6 +109,7 @@ const ProductCard = ({ item, index }) => {
               ).map((uri, index) => (
                 <div className="flex justify-center" key={index}>
                   <img
+                  onClick={()=>handleAddtoCart(item)}
                     src={
                       uri
                         ? uri
@@ -83,8 +121,13 @@ const ProductCard = ({ item, index }) => {
                 </div>
               ))}
             </Carousel>
+            <FaPlus onClick={()=>handleAddtoCart(item)} className=" absolute mb-52 ml-52 bg-green-200 text-[#15892e] p-1 w-6 h-6 rounded-full" />
 
-            <div>
+            <div
+              onClick={() => {
+                router.push(`/ProductDetails?product=${item._id}`);
+              }}
+            >
               <Typography className="text-center" variant="subtitle2">
                 {item.name}
               </Typography>
@@ -95,7 +138,12 @@ const ProductCard = ({ item, index }) => {
               </div>
             </div>
 
-            <div className="flex gap-2 justify-between place-items-end mt-2 flex-row w-full px-2 text-gray-600 ">
+            <div
+              onClick={() => {
+                router.push(`/ProductDetails?product=${item._id}`);
+              }}
+              className="flex gap-2 justify-between place-items-end mt-2 flex-row w-full px-2 text-gray-600 "
+            >
               {item.price && (
                 <span className="flex gap-[1px] text-sm justify-center items-center">
                   <FaRupeeSign className="mt-[5px] text-xs mb-1" />
@@ -117,7 +165,6 @@ const ProductCard = ({ item, index }) => {
           </div>
         </div>
       )}
-  
     </>
   );
 };

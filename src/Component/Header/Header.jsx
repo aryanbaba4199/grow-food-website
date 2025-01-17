@@ -115,14 +115,14 @@ const Header = () => {
                     </button>
                   )}
 
-                  <button
+                  {/* <button
                     onClick={handleSignOut}
                     className="bg-gray-100 text-white bg-color-1 w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
                     href="Authentication"
                   >
                     {" "}
                     Log out
-                  </button>
+                  </button> */}
                 
                 </>
               )}

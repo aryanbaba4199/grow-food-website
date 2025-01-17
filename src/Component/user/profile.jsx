@@ -17,7 +17,7 @@ import {
   textFieldClasses,
 } from "@mui/material";
 import Link from "next/link";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaLock } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import Image from "next/image";
 import { updateUserDetails } from "@/Api";
@@ -36,7 +36,7 @@ const defaultformData = {
 };
 
 const Profile = (setOpen) => {
-  const { user } = useContext(UserContext);
+  const { user, setUser, setToken } = useContext(UserContext);
   const defaultProfileForm = {
     image: user?.image,
     tempImageUrl : user?.image,
@@ -56,8 +56,8 @@ const Profile = (setOpen) => {
  
 
   useEffect(() => {
-    getAddress(user._id);
-  }, [user, user._id]);
+    getAddress(user?._id);
+  }, [user, user?._id]);
 
   const handleChange = (e) => {
     if (formData.userId === "") {
@@ -208,6 +208,18 @@ const Profile = (setOpen) => {
       });
     }
   }
+
+  const handleSignOut = () => {
+    try {
+      localStorage.removeItem("gfToken");
+      localStorage.removeItem("gfuser");
+      setUser(null);
+      setToken(null);
+      router.push("/");
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <>
@@ -381,6 +393,16 @@ const Profile = (setOpen) => {
                 <FaPlus
                   className=" react-icons text-lg"
                   onClick={() => setAddressMode(!addressmode)}
+                />
+              </div>
+
+              <div className="flex justify-between items-center mt-2 px-4 bg-color-1 hover:cursor-pointer">
+                <span className="font font-semibold text-white" onClick={handleSignOut}>
+                  Sign Out
+                </span>
+                <FaLock
+                  className=" react-icons text-lg"
+                  onClick={handleSignOut}
                 />
               </div>
             </div>

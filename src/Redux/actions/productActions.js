@@ -38,7 +38,7 @@ export const getProduct = (id) => async (dispatch) => {
 
 export const getBrandsProduct = (brand)=> async(dispatch)=>{
   try{
-    const res = await axios.get(`${getBrandsProductApi}${brand}`)
+    const res = await axios.get(`${getBrandsProductApi}/${brand}`)
     dispatch({type : 'GET_BRANDS_PRODUCT', payload: res.data});
   }catch(err){
     console.error('Error fetching brands product', err);

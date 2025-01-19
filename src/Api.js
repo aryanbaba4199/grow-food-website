@@ -94,6 +94,7 @@ export const adminOrders = `${apiurl}/api/admin/orders`
 
 
 export const getterFunction = async(uri)=>{
+    console.log('uri', uri);
     try{
         const res = await axios.get(uri)
     return res.data;

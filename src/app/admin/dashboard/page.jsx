@@ -38,7 +38,7 @@ import Link from "next/link";
 import ViewProduct from "@/Component/Admin/products/ViewProduct";
 import Loader from "@/Component/helpers/loader";
 import UserContext from "@/userContext";
-import { adminOrders, getterFunction, vendorOrdersApi } from "@/Api";
+import { adminOrders, getterFunction, vendorApi, } from "@/Api";
 import { useSelector } from "react-redux";
 import EditProducts from "@/Component/Admin/products/EditProducts";
 import OrdersTable from "@/Component/Admin/Dashboard/OrdersTable";
@@ -128,7 +128,7 @@ const Page = () => {
   
   const [editProduct, setEditProduct] = useState(null);
   const x = useSelector((state) => state.products.products.data)
-  console.log('x have',x);
+
 
 
 
@@ -139,16 +139,18 @@ const Page = () => {
     }
   }, [user, x]);
   const vendorOrder = async (id) => {
-   
+   console.log('hi')
     try {
       if(user.userType==='admin'){
         const res = await getterFunction(`${adminOrders}/id=${id}/pageNum=${1}`);
-      
+        console.log('admin');
        setOrders(res.orders);
        setTotalOrders(res.totalOrders);
       }else if(user.userType==='Vendor'){
-       
-      const res = await getterFunction(`${vendorOrdersApi}/${user._id}`);
+        console.log('vendor');
+        console.log(`vendorOrdersApi.orders}/${id}`)
+      const res = await getterFunction(`${vendorApi.orders}/${id}`);
+      console.log('vendor', res);
       setTotalOrders(res.totalOrders);  
       setOrders(res);
       }
@@ -158,18 +160,16 @@ const Page = () => {
     }
   };
   const getProducts = async(id)=>{
-    console.log('type is',user.userType)
-    console.log('id is',id)
+
     if(user.userType==='Vendor'){
-      console.log('product',user.userType)
+
       const y = await x.filter(
         (item) => item.vendorId === id
       );
-      console.log('y have', y)
+
       setProducts(y);
     }else if(user.userType==='admin'){
-      console.log('y have', x)
-      console.log('product',user.userType)
+
       setProducts(x);
     }
   }

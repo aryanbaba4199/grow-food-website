@@ -361,10 +361,10 @@ const Profile = (setOpen) => {
             </div>
             <div className="flex flex-col justify-center items-center mt-4 gap-2 ">
               <span className="font-semibold text-xl px-4 py-1 bg-color-1 rounded-lg text-white">
-                {user.name}
+                {user?.name}
               </span>
               <span className="text-sm border-[1px] border-[#1e4426] rounded-sm px-2 py-1">
-                {user.email}
+                {user?.email}
               </span>
             </div>
             <div>
@@ -379,7 +379,7 @@ const Profile = (setOpen) => {
               </div>
               <div className="flex justify-between items-center mt-2 px-4 bg-color-1">
                 <Link href="/cart" className="font font-semibold text-white">
-                  Cart : {user.cartLength}
+                  Cart : {user?.cartLength}
                 </Link>
                 <FaEye
                   className=" react-icons text-lg"

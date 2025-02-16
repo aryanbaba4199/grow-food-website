@@ -7,6 +7,7 @@ import {
   FaLock,
   FaCartPlus,
   FaRegBell,
+  FaUser,
 } from "react-icons/fa";
 import Link from "next/link";
 
@@ -24,6 +25,7 @@ import UserContext from "@/userContext";
 import { GrUserAdmin } from "react-icons/gr";
 
 import { sideBarData } from "@/constants";
+import AdminHeader from "./AdminHeader";
 const Header = () => {
   const router = useRouter();
 
@@ -32,6 +34,7 @@ const Header = () => {
   const [showProfile, setShowProfile] = useState(false);
 
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [showDashboard, setShowDashboard] = useState(false);
 
@@ -40,7 +43,11 @@ const Header = () => {
   useEffect(() => {
     if (user) {
       if (user.userType === "admin" || user.userType == "Vendor") {
+        console.log("user", user);
         setShowDashboard(true);
+
+        router.push("/admin/dashboard");
+        setLoading(true);
       }
     }
   }, [user]);
@@ -59,63 +66,60 @@ const Header = () => {
 
   return (
     <>
-      <div className="text-slate-950 top-0 bg-gray-200 fixed z-[500] w-full">
-        <div className="flex  items-center px-4 text-sm">
-          <div className="flex justify-start items-center w-full">
-            <div className=" flex justify-start gap-2 items-center">
-              <MdMenu
-                onClick={() => setOpen(!open)}
-                className="text-3xl hover:cursor-pointer md:hidden block"
-              />
+      {showDashboard ? (
+        <AdminHeader />
+      ) : (
+        <div className="text-slate-950 top-0 bg-gray-200 fixed z-[500] w-full">
+          {!loading && (
+            <div className="flex  items-center px-4 text-sm">
+              <div className="flex justify-start items-center w-full">
+                <div className=" flex justify-start gap-2 items-center">
+                  <MdMenu
+                    onClick={() => setOpen(!open)}
+                    className="text-3xl hover:cursor-pointer md:hidden block"
+                  />
 
-              <Link href="/">
-                <Image
-                  src="/favicon.ico"
-                  width={50}
-                  height={50}
-                  className=" w-12 h-12 rounded-full p-1"
-                  alt="Logo"
-                />
-              </Link>
-            </div>
-            <div className="md:w-[70%] w-[80%] md:ml-16 ml-2">
-              <Search />
-            </div>
-          </div>
-
-          <div className="md:flex hidden gap-2 w-[50%]">
-            <div className="flex justify-between items-center gap-4 w-full mr-40">
-              {sideBarData.map((item, index) => (
-                <>
-                  <Link
-                    className=" text-white bg-color-1 w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
-                    href={`${item.path}`}
-                  >
-                    {item.name}
+                  <Link href="/">
+                    <Image
+                      src="/favicon.ico"
+                      width={50}
+                      height={50}
+                      className=" w-12 h-12 rounded-full p-1"
+                      alt="Logo"
+                    />
                   </Link>
-                </>
-              ))}
-              {!token ? (
-                <Link
-                  className="bg-gray-100 text-white bg-color-1 w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
-                  href="Authentication"
-                >
-                  Log in
-                </Link>
-              ) : (
-                <>
-                  {showDashboard && (
-                    <button
-                      onClick={() => router.push("/admin/dashboard")}
-                      className="bg-gray-100 text-white bg-color-1 w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
-                      href="Authentication"
-                    >
-                      {" "}
-                      Dashboard
-                    </button>
-                  )}
+                </div>
+                <div className="md:w-[70%] w-[80%] md:ml-16 ml-2">
+                <Search />
+                </div>
+              </div>
 
-                  {/* <button
+              <div className="md:flex hidden gap-2 w-[50%]">
+                <div className="flex justify-between items-center gap-4 w-full mr-40">
+                  {sideBarData.map((item, index) => (
+                    <div className="w-full flex ">
+                      {!showDashboard && (
+                        <Link
+                          className="flex-1 bg-green-100 text-green-950 font-semibold  w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
+                          href={`${item.path}`}
+                        >
+                          {item.name}
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                  {!token ? (
+                    <div className="flex ">
+                    <Link
+                      className="bg-gray-100 text-white bg-color-1 w-20  flex-1 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
+                      href="/Authentication"
+                    >
+                      Log in
+                    </Link>
+                    </div>
+                  ) : (
+                    <>
+                      {/* <button
                     onClick={handleSignOut}
                     className="bg-gray-100 text-white bg-color-1 w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
                     href="Authentication"
@@ -123,22 +127,20 @@ const Header = () => {
                     {" "}
                     Log out
                   </button> */}
-                
-                </>
-              )}
-                {token && (
-              <img
-                src={userDetails?.user?.image ?? "/favicon.ico"}
-                className="w-8 h-8 hover:cursor-pointer rounded-full mr-4"
-                onClick={() => setShowProfile(true)}
-              />
-            )}
+                    </>
+                  )}
+                  {token && (
+                    <div className="flex w-full justify-end">
+                      <FaUser  onClick={() => setShowProfile(true)}  className="bg-green-100 text-green-700 w-8 p-1 rounded-full h-8 hover:cursor-pointer"/>
+                     
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-
-            
-          </div>
+          )}
         </div>
-      </div>
+      )}
 
       <Drawer open={open} onClose={() => setOpen(false)}>
         <div className="bg-gray-100 h-full flex flex-col ">

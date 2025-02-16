@@ -6,23 +6,22 @@ import {
   authApi,
   forgotPasswordApi,
   getterFunction,
-  getUserApi,
   posterFunction,
   registerApi,
-  userAPI,
   userlogin,
 } from "@/Api";
-import { fetchUserDetails, logout } from "@/Redux/actions/userAuthAction";
+import { logout } from "@/Redux/actions/userAuthAction";
 import Swal from "sweetalert2";
-import { usersAPi } from "@/Api";
+
 import axios from "axios";
 import UserContext from "@/userContext";
-import { logo_uri } from "@/Api";
+
 import Loader from "@/Component/helpers/loader";
 import { useDispatch } from "react-redux";
 import Head from "next/head";
 import { Button, TextField } from "@mui/material";
-import Analytics from "@/Component/Admin/Analytics";
+
+import LoginPoster from "@/Component/helpers/LoginPoster";
 
 const Page = () => {
   const [authType, setAuthType] = useState("SignIn");
@@ -46,12 +45,16 @@ const Page = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(token);
-    if (token) {
-      console.log("logingg");
-      router.push("/");
+    if (typeof window !== "undefined") {
+      console.log(token);
+      if (token) {
+        console.log("logingg");
+        router.push("/");
+      }
     }
-  }, [user]);
+  }, [token]);
+  
+  
 
   const handleAuthSwitch = () => {
     setAuthType(authType == "SignIn" ? "SignUp" : "SignIn");
@@ -234,118 +237,135 @@ const Page = () => {
         <Loader />
       ) : (
         <>
-          <div className="mt-8">
-            <div className="flex flex-col justify-center items-center">
-              <img
-                src="/favicon.ico"
-                alt="Grow Food"
-                className=" w-32 h-32 border-green-700 shadow-black shadow-lg border-2 rounded-full p-4"
-              />
-              <h2 className="text-2xl font-semibold text-white bg-color-1 text-center mt-4 my-2 px-4 py-1 rounded-md">
-                {authType == "SignIn" ? "Sign In" : "Create Account"}
-              </h2>
+          <div className="flex min-h-screen bg-gray-100">
+            {/* Left Section - LoginPoster */}
+            <div className="w-[70%] p-8 flex justify-center items-center">
+              <LoginPoster />
             </div>
-            {!open ? (
-              <Authform
-                authType={authType}
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-                name={name}
-                setName={setName}
-                mobile={mobile}
-                setMobile={setMobile}
-                handleAuthSwitch={handleAuthSwitch}
-                handleSubmit={handleSubmit}
-                shopName={shopName}
-                setShopName={setShopName}
-                gst={gst}
-                setGst={setGst}
-                shopAddress={shopAddress}
-                setShopAddress={setShopAddress}
-                setUserType={setUserType}
-              />
-            ) : (
-              <div className="flex justify-center items-center flex-col">
-                <p className="font-semibold text-lgg my-4">
-                  Please enter OTP ( You can get this on your email ){" "}
-                </p>
-                <TextField
-                  type="number"
-                  required
-                  onChange={(e) => setOtp(e.target.value)}
-                  value={otp}
+
+            {/* Right Section - Auth Section */}
+            <div className="mt-8 w-[30%] bg-white rounded-lg shadow-lg min-h-screen p-6">
+              <div className="flex flex-col justify-center items-center">
+                <img
+                  src="/favicon.ico"
+                  alt="Grow Food"
+                  className="w-32 h-32 border-4 border-yellow-400 shadow-lg rounded-full p-4"
                 />
+                <h2 className="text-3xl font-semibold text-yellow-600 mt-6 mb-4">
+                  {authType === "SignIn" ? "Sign In" : "Create Account"}
+                </h2>
               </div>
-            )}
-            <>
-              {resetOpen && (
-                <>
-                  <div className="flex justify-center items-center">
-                    <div className="flex flex-col gap-4">
-                      <TextField
-                        required
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="New Password"
-                      />
-                      <TextField
-                        required
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm New Password"
-                      />
-                    </div>
-                  </div>
-                </>
+
+              {/* Auth Form or OTP Section */}
+              {!open ? (
+                <Authform
+                  authType={authType}
+                  email={email}
+                  setEmail={setEmail}
+                  password={password}
+                  setPassword={setPassword}
+                  name={name}
+                  setName={setName}
+                  mobile={mobile}
+                  setMobile={setMobile}
+                  handleAuthSwitch={handleAuthSwitch}
+                  handleSubmit={handleSubmit}
+                  shopName={shopName}
+                  setShopName={setShopName}
+                  gst={gst}
+                  setGst={setGst}
+                  shopAddress={shopAddress}
+                  setShopAddress={setShopAddress}
+                  setUserType={setUserType}
+                />
+              ) : (
+                <div className="flex justify-center items-center flex-col">
+                  <p className="font-semibold text-lg my-4">
+                    Please enter OTP (You can get this on your email)
+                  </p>
+                  <TextField
+                    type="number"
+                    required
+                    onChange={(e) => setOtp(e.target.value)}
+                    value={otp}
+                    className="w-full p-2 border-2 border-gray-300 rounded-md mb-4"
+                  />
+                </div>
               )}
-            </>
-            {user?.user && (
-              <div className="mt-8 text-white">
-                <h3>User Details:</h3>
-                <p>Name: {user.name}</p>
-                <p>Email: {user.email}</p>
-                <p>Mobile: {user.mobile}</p>
-                {/* <p>Address: {user.address.address}, {user.address.city}, {user.address.state} - {user.address.zip}</p> */}
-                <button onClick={() => dispatch(logout())}>Sign Out</button>
-              </div>
-            )}
-          </div>
-          {open && (
-            <>
-              <div className="flex justify-center items-center mt-4">
-                <button
-                  onClick={handleVerifyOtp}
-                  className="bg-[#15892e] px-4 py-2 rounded-md text-white my-2"
+
+              {/* Password Reset Section */}
+              {resetOpen && (
+                <div className="flex justify-center items-center flex-col mt-4">
+                  <TextField
+                    required
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New Password"
+                    className="w-full p-2 border-2 border-gray-300 rounded-md mb-4"
+                  />
+                  <TextField
+                    required
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm New Password"
+                    className="w-full p-2 border-2 border-gray-300 rounded-md mb-4"
+                  />
+                </div>
+              )}
+
+              {/* User Info Section */}
+              {user?.user && (
+                <div className="mt-8 text-gray-700">
+                  <h3 className="font-semibold text-lg mb-2">User Details:</h3>
+                  <p>Name: {user.name}</p>
+                  <p>Email: {user.email}</p>
+                  <p>Mobile: {user.mobile}</p>
+                  <button
+                    onClick={() => dispatch(logout())}
+                    className="mt-4 text-yellow-600 hover:text-yellow-500"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+
+              {/* OTP Validation & Forgot Password Buttons */}
+              {open && (
+                <div className="flex justify-center items-center mt-6">
+                  <button
+                    onClick={handleVerifyOtp}
+                    className="bg-yellow-600 text-white px-6 py-2 rounded-md hover:bg-yellow-500 transition duration-300"
+                  >
+                    Validate OTP
+                  </button>
+                </div>
+              )}
+
+              {resetOpen && (
+                <div className="flex justify-center items-center mt-6">
+                  <button
+                    onClick={handleResetPassword}
+                    className="bg-yellow-600 text-white px-6 py-2 rounded-md hover:bg-yellow-500 transition duration-300"
+                  >
+                    Reset Password
+                  </button>
+                </div>
+              )}
+
+              <div className="flex justify-center py-4">
+                <Button
+                  onClick={() => setAuthType("forgot")}
+                  className="text-yellow-600 hover:text-yellow-500"
                 >
-                  Validate OTP
-                </button>
+                  Forgot Password
+                </Button>
               </div>
-            </>
-          )}
-          {resetOpen && (
-            <>
-              <div className="flex justify-center items-center mt-4">
-                <button
-                  onClick={handleResetPassword}
-                  className="bg-[#15892e] px-4 py-2 rounded-md text-white my-2"
-                >
-                  Validate OTP
-                </button>
-              </div>
-            </>
-          )}
-          <div className="flex justify-center py-4">
-            <Button onClick={() => setAuthType("forgot")}>
-              Forgot Password
-            </Button>
+            </div>
           </div>
         </>
       )}
-      
     </>
   );
 };

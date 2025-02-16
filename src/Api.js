@@ -83,12 +83,15 @@ export const createSubCategory = `${apiurl}/api/products/createSubCategory`
 export const vendorApi  = {
     orders : `${apiurl}/api/vendors/orders`,
     products : `${apiurl}/api/vendors/products`,
+    displayProducts : `${apiurl}/api/vendors/displayProducts`,
+    updateOrder : `${apiurl}/api/vendors/updateOrder`,
 }
 
 
 // Admin API
 
 export const adminOrders = `${apiurl}/api/admin/orders`
+export const vendorProducts = `${apiurl}/api/admin/products`
 
 
 

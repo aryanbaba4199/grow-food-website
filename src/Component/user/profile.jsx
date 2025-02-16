@@ -215,7 +215,7 @@ const Profile = (setOpen) => {
       localStorage.removeItem("gfuser");
       setUser(null);
       setToken(null);
-      router.push("/");
+      router.push("/Authentication");
     } catch (e) {
       console.error(e);
     }
@@ -343,7 +343,7 @@ const Profile = (setOpen) => {
                 }
                 width={150}
                 height={150}
-                className="rounded-full mx-8 border-2 border-[#1e4426] shadow-md shadow-[#1e4426] mt-1"
+                className="rounded-full w-48 h-48 mx-8 border-2 border-[#1e4426] shadow-md shadow-[#1e4426] mt-1"
               />
               <FaEdit
                 className="text-[#1e4426] hover:cursor-pointer text-xl"
@@ -368,8 +368,8 @@ const Profile = (setOpen) => {
               </span>
             </div>
             <div>
-              <div className="flex justify-between items-center mt-4 px-4 bg-color-1">
-                <Link href="/Orders" className="font font-semibold text-white">
+              <div className="flex justify-between items-center mt-4 px-4 bg-green-50 text-green-600">
+                <Link href="/Orders" className="font font-semibold text-green-600">
                   Orders : {user?.orderLength ?? 0}{" "}
                 </Link>
                 <FaEye
@@ -377,8 +377,8 @@ const Profile = (setOpen) => {
                   
                 />
               </div>
-              <div className="flex justify-between items-center mt-2 px-4 bg-color-1">
-                <Link href="/cart" className="font font-semibold text-white">
+              <div className="flex justify-between items-center mt-2 px-4 bg-green-50 text-green-600">
+                <Link href="/cart" className="font font-semibold text-green-600">
                   Cart : {user?.cartLength}
                 </Link>
                 <FaEye
@@ -386,8 +386,8 @@ const Profile = (setOpen) => {
                   
                 />
               </div>
-              <div className="flex justify-between items-center mt-2 px-4 bg-color-1 hover:cursor-pointer">
-                <span className="font font-semibold text-white" onClick={()=>setShowAddress(!showAddress)}>
+              <div className="flex justify-between items-center mt-2 px-4 bg-green-50 text-green-600 hover:cursor-pointer">
+                <span className="font font-semibold text-green-600" onClick={()=>setShowAddress(!showAddress)}>
                   Address : {address.length}{" "}
                 </span>
                 <FaPlus
@@ -396,8 +396,8 @@ const Profile = (setOpen) => {
                 />
               </div>
 
-              <div className="flex justify-between items-center mt-2 px-4 bg-color-1 hover:cursor-pointer">
-                <span className="font font-semibold text-white" onClick={handleSignOut}>
+              <div className="flex justify-between items-center mt-2 px-4 bg-green-50 text-green-600 hover:cursor-pointer">
+                <span className="font font-semibold text-green-600" onClick={handleSignOut}>
                   Sign Out
                 </span>
                 <FaLock

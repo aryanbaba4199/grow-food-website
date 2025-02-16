@@ -14,18 +14,26 @@ import {
   Button,
   Card,
 } from "@mui/material";
-import { FaEye } from "react-icons/fa";
+import { FaArrowDown, FaEye } from "react-icons/fa";
 import { MdLocationOn, MdProductionQuantityLimits } from "react-icons/md";
 import { IoBagCheckOutline } from "react-icons/io5";
-import { getDeliveryAddress, getterFunction, usersAPi } from "@/Api";
+import {
+  getDeliveryAddress,
+  getterFunction,
+  updaterFunction,
+  usersAPi,
+  vendorApi,
+} from "@/Api";
+import Swal from "sweetalert2";
+import { memo } from "react";
 
-const OrdersTable = ({ orders }) => {
+const OrdersTable = ({ orders, handleStatusChange }) => {
   const [open, setOpen] = useState(false); // State to control the dialog
   const [selectedOrder, setSelectedOrder] = useState(null); // State to store the selected order details
-  const [address, setAddress] = useState(null)
+  const [address, setAddress] = useState(null);
   const handleDialogOpen = (order) => {
-    setSelectedOrder(order); // Set the selected order details
-    setOpen(true); // Open the dialog
+    setSelectedOrder(order);
+    setOpen(true);
   };
 
   const handleDialogClose = () => {
@@ -33,24 +41,23 @@ const OrdersTable = ({ orders }) => {
     setOpen(false); // Close the dialog
   };
 
-  useEffect(()=>{
-    if(selectedOrder){
+  useEffect(() => {
+    if (selectedOrder) {
       getAddress(selectedOrder?.addressId);
     }
-    
-  }, [selectedOrder])
+  }, [selectedOrder]);
 
   const getAddress = async (addressId) => {
     try {
-      const response = await getterFunction(`${getDeliveryAddress}/${addressId}`)
-      setAddress(response)
+      const response = await getterFunction(
+        `${getDeliveryAddress}/${addressId}`
+      );
+      setAddress(response);
       console.log(response);
     } catch (error) {
-      console.error('Error in getting address',error);
+      console.error("Error in getting address", error);
     }
-  }
-
-  console.log(selectedOrder)
+  };
 
   return (
     <>
@@ -61,14 +68,35 @@ const OrdersTable = ({ orders }) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>SN</strong></TableCell>
-                    <TableCell><strong>Order ID</strong></TableCell>
-                    <TableCell><strong>Name</strong></TableCell>
-                    <TableCell><strong>Brand</strong></TableCell>
-                    <TableCell><strong>Qty</strong></TableCell>
-                    <TableCell><strong>Price</strong></TableCell>
-                    <TableCell><strong>Order Amount</strong></TableCell>
-                    <TableCell><strong>Action</strong></TableCell>
+                    <TableCell>
+                      <strong>SN</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Order ID</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Brand</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Qty</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Price</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Amount</strong>
+                    </TableCell>
+                    <TableCell>
+                      <p className="flex gap-2 justify-center items-center">
+                        <strong>Status</strong>
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Action</strong>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -82,6 +110,23 @@ const OrdersTable = ({ orders }) => {
                         <TableCell>{product.quantity}</TableCell>
                         <TableCell>{product.price}</TableCell>
                         <TableCell>{product.totalPrice}</TableCell>
+                        <TableCell>
+                          {/* Dropdown for Order Status */}
+                          <select
+                            className="px-3 py-2 border rounded-lg"
+                            value={row.status}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                row.orderId,
+                                e.target.value
+                              )
+                            }
+                          >
+                            <option value="Processing">Processing</option>
+                            <option value="Dispatched">Dispatched</option>
+                            <option value="Canceled">Canceled</option>
+                          </select>
+                        </TableCell>
                         <TableCell>
                           <FaEye
                             className="text-lg text-[#15892e] cursor-pointer"
@@ -150,22 +195,20 @@ const OrdersTable = ({ orders }) => {
                       <MdLocationOn className="text-lg font-bold bg-green-300 w-6 rounded-full p-1 h-6" />
                       Delivery Details
                     </p>
-                    {address && 
-                    <>
-                    <p>
-                      <strong>Client Name:</strong>{" "}
-                      {address.name}
-                    </p>
-                    <p>
-                      <strong>Client Mobile:</strong>{" "}
-                      {address.mobile}
-                    </p>
-                    <p>
-                      <strong>Client Address:</strong>{" "}
-                      {`${address.locality}, ${address.city}, ${address.state}, ${address.zip}`}
-                    </p>
-                    </>
-                    }
+                    {address && (
+                      <>
+                        <p>
+                          <strong>Client Name:</strong> {address.name}
+                        </p>
+                        <p>
+                          <strong>Client Mobile:</strong> {address.mobile}
+                        </p>
+                        <p>
+                          <strong>Client Address:</strong>{" "}
+                          {`${address.locality}, ${address.city}, ${address.state}, ${address.zip}`}
+                        </p>
+                      </>
+                    )}
                   </Card>
                   <Card elevation={4} className="px-8 py-1 m-2 my-4">
                     <p className=" flex gap-2 items-center font-semibold text-[#15892e]">
@@ -184,7 +227,8 @@ const OrdersTable = ({ orders }) => {
                       {selectedOrder.productQty}
                     </p>
                     <p>
-                      <strong>Order Amount :</strong> {selectedOrder.venOrderAmount}
+                      <strong>Order Amount :</strong>{" "}
+                      {selectedOrder.venOrderAmount}
                     </p>
                     <p>
                       <strong>Order Date:</strong>{" "}
@@ -213,4 +257,4 @@ const OrdersTable = ({ orders }) => {
   );
 };
 
-export default OrdersTable;
+export default  React.memo(OrdersTable);

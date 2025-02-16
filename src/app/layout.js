@@ -13,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} mt-16`}>
+      <body className={`${inter.className} mt-12`}>
         {/* Wrap the children with the ClientProvider */}
         <ClientProvider>{children}</ClientProvider>
       </body>

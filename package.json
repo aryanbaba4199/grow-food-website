@@ -19,6 +19,7 @@
     "browser-image-compression": "^2.0.2",
     "chart": "^0.1.2",
     "crypto-js": "^4.2.0",
+    "firebase": "^11.3.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf-invoice-template": "^1.4.4",
     "mongoose": "^8.7.0",

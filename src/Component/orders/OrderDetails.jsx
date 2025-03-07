@@ -11,10 +11,12 @@ import { MdLocationOn, MdOutlineShoppingCart } from "react-icons/md";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import Indicator from "./Indicator";
 import { IoIosClose } from "react-icons/io";
+import InvoicePage from "../helpers/InvoicePage";
 
 const OrderDetails = ({ id, setOpen }) => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showBill, setShowBill] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -66,7 +68,11 @@ const OrderDetails = ({ id, setOpen }) => {
     );
   }
 
+  console.log(order);
+
   return (
+    <>
+    {showBill ? <InvoicePage bill={order} /> : 
     <div className="p-4 max-w-4xl mx-auto ">
       <Typography
         variant="h5"
@@ -155,7 +161,13 @@ const OrderDetails = ({ id, setOpen }) => {
           </div>
         </CardContent>
       </Card>
+      <div className="flex justify-center items-center font-semibold p-8">
+        <span onClick={()=>setShowBill(true)} className="bg-gray-950 text-white px-4 py-2 rounded-t-md hover:cursor-pointer hover:bg-gray-800">View Invoice</span>
+
+      </div>
     </div>
+}
+    </>
   );
 };
 

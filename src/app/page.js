@@ -5,15 +5,15 @@ import UserContext from "@/userContext";
 import Dashboard from "../Component/Admin/Dashboard/Dashboard";
 import Page from "./admin/dashboard/page";
 
-const page = () => {
+const Entrance = () => {
   const { user } = useContext(UserContext);
   const [isAdmin, setisAdmin] = useState(false);
   useEffect(() => {
-    if (user && user.userType === "admin") {
+    if (user && (user.userType === "admin" || user.userType==='Vendor')) {
       setisAdmin(true);
     }
   }, [user]);
   return <>{isAdmin ? <Page/> : <Home />}</>;
 };
 
-export default page;
+export default Entrance;

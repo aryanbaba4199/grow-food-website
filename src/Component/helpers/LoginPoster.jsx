@@ -9,7 +9,7 @@ const LoginPoster = () => {
        
 
         <div className="p-2 flex flex-col justify-center items-center text-center">
-          <h2 className="text-4xl font-bold text-yellow-600 mb-6">Grow Food - India's First Raw Delivery Service</h2>
+          <h2 className="text-4xl font-bold text-yellow-600 mb-6">{`Grow Food - India's First Raw Delivery Service`}</h2>
           <p className="text-lg text-gray-600 mb-4">Providing high-quality, fresh ingredients directly to restaurants</p>
           
           {/* Key Features Section */}

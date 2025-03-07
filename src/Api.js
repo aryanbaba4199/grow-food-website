@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const apiurl = 'http://localhost:5000'
-const apiurl = 'https://growfoodapi-1032443967847.asia-south1.run.app'
+const apiurl = 'http://localhost:5000'
+//  const apiurl = 'https://growfoodapi-1032443967847.asia-south1.run.app'
 
 export const API_URL = apiurl;
 export const logo_uri = 'https://i.pinimg.com/736x/5d/90/4b/5d904b9f3b2f1a21c7ef3d19729598a3.jpg'
@@ -11,7 +11,7 @@ export const logo_uri = 'https://i.pinimg.com/736x/5d/90/4b/5d904b9f3b2f1a21c7ef
 export const registerApi = `${apiurl}/api/users/register`
 export const userlogin = `${API_URL}/api/users/login`;
 export const usersAPi = `${apiurl}/api/users`
-export const getUserApi = `${apiurl}/api/users`
+export const getUserApi = `${apiurl}/api/users/getOneUser`
 export const forgotPasswordApi = `${apiurl}/api/users/forgotPassword`
 export const authApi = {
     forgot : `${apiurl}/api/users/forgotPassword`,
@@ -25,6 +25,7 @@ export const createAddress = `${apiurl}/api/users/createAddress`
 export const getuserAddress = `${apiurl}/api/users/getAddress`
 export const getAllUsers = `${apiurl}/api/users/getallusersforadmin`
 export const deleteAddressApi = `${apiurl}/api/users/deleteAddress`
+
 
  
 
@@ -85,6 +86,10 @@ export const vendorApi  = {
     products : `${apiurl}/api/vendors/products`,
     displayProducts : `${apiurl}/api/vendors/displayProducts`,
     updateOrder : `${apiurl}/api/vendors/updateOrder`,
+    getState : `${apiurl}/api/activity/states`,
+    getDistricts : `${apiurl}/api/activity/districts`,
+    distributionArea : `${apiurl}/api/activity/serviceArea`,
+    getChatters : `${apiurl}/api/vendors/chatters`,
 }
 
 
@@ -92,6 +97,9 @@ export const vendorApi  = {
 
 export const adminOrders = `${apiurl}/api/admin/orders`
 export const vendorProducts = `${apiurl}/api/admin/products`
+export const adminApi ={
+    sliders : `${apiurl}/api/admin/sliders`,
+}
 
 
 

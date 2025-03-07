@@ -7,6 +7,12 @@ import {
   DialogContent,
   Typography,
   DialogActions,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  IconButton,
+  Avatar,
 } from "@mui/material";
 import axios from "axios";
 import Loader from "../../helpers/loader";
@@ -15,11 +21,10 @@ import { useRouter } from "next/navigation";
 import { getCategories } from "@/Redux/actions/productActions";
 import Swal from "sweetalert2";
 import { uploadImageToCloudinary, whosVisiting } from "@/Context/functions";
-import { FaPlus } from "react-icons/fa";
-import { decryptData } from "@/Context/userFunction";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
-const CreateCategory = ({user}) => {
+const CreateCategory = ({ user }) => {
   const [categoryName, setCategoryName] = useState("");
   const [icon, setIcon] = useState(null);
   const [iconURL, setIconURL] = useState("");
@@ -29,19 +34,22 @@ const CreateCategory = ({user}) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [open, setOpen] = useState(false);
 
-
-
   const dispatch = useDispatch();
-
   const router = useRouter();
+  const categories = useSelector((state) => state.products.categories);
 
   useEffect(() => {
     dispatch(getCategories());
-  }, []);
+  }, [dispatch]);
 
-  const categories = useSelector((state) => state.products.categories);
-
-  console.log(categories);
+  useEffect(() => {
+    setTimeout(() => {
+      const x = whosVisiting();
+      if (x !== "Admin" && x !== "Vendor") {
+        router.push("/");
+      }
+    }, 1000);
+  }, [router]);
 
   const handleImageUpload = async () => {
     if (!icon) return "";
@@ -106,21 +114,12 @@ const CreateCategory = ({user}) => {
     }
   };
 
-  useEffect(()=>{
-    setTimeout(() => {
-     const x= whosVisiting()
-     if(!x==="Admin" || !x==="Vendor"){
-      router.push("/")
-     }
-    }, 1000); 
-  }, [])
-
-  const handleDelete = async () => {
-    if (!selectedCategory) return;
+  const handleDelete = async (category) => {
+    if (!category) return;
     setLoader(true);
     try {
       const res = await axios.delete(
-        `${API_URL}/api/products/deleteCategory/${selectedCategory._id}`
+        `${API_URL}/api/products/deleteCategory/${category._id}`
       );
       if (res.status === 200) {
         Swal.fire("Success", "Category deleted successfully", "success");
@@ -157,9 +156,7 @@ const CreateCategory = ({user}) => {
   };
 
   const handleEdit = (category) => {
-    if(user!=='admin'){
-      return;
-    }
+    
     setSelectedCategory(category);
     setCategoryName(category.name);
     setIconURL(category.icon);
@@ -173,33 +170,44 @@ const CreateCategory = ({user}) => {
       <div className="px-8">
         <Typography
           variant="h4"
-          className="mb-4 mt-4 flex justify-center items-center "
+          className="mb-4 mt-4 flex justify-center items-center"
         >
-          <p className="flex bg-color-1 rounded-sm">
-            <span className="rounded-s-md bg-color-1 h-10 px-4">Category</span>
-            <FaPlus
-              onClick={() => setOpen(true)}
-              className="mx-2 my-1 hover:cursor-pointer bg-white text-green-700 rounded-full"
-            />
-          </p>
+          <p className="flex  rounded-sm w-full  items-center">
+                      <span className="w-[70%] text-center mb-8 h-10 px-4">Brands</span>
+                      <button onClick={() => setOpen(true)} className="flex text-[24px] bg-green-200 px-4 py-1 rounded-lg gap-4">
+                        Add Category
+                      <FaPlus
+                        
+                        className="mx-2 my-1 hover:cursor-pointer bg-white text-green-700 rounded-full"
+                      />
+                      </button>
+                    </p>
         </Typography>
-        <div className="flex flex-wrap justify-between gap-4 items-center mt-8">
-          {categories && categories.map((item, index) => (
-            <div
-              key={index}
-              className="w-32 h-28 flex-1 pt-2 border shadow-md shadow-black flex flex-col justify-center items-center cursor-pointer"
-              onClick={() => handleEdit(item)}
-            >
-              <img
-                src={item?.icon || "https://via.placeholder.com/150"}
-                className="w-20 h-16 rounded-md"
-              />
-              <span className="mt-2 w-full bg-color-1 text-center">
-                {item.name}
-              </span>
-            </div>
+        <List className="flex justify-between items-center border-b">
+                  <ListItem className="flex-1 font-bold">Image</ListItem>
+                  <ListItem className="flex-1 font-bold">Name</ListItem>
+                  <ListItem className="flex-1 font-bold justify-center">Action</ListItem>
+        
+                </List>
+        <List>
+          {categories.map((item) => (
+             <ListItem key={item._id} className="border-b flex justify-between mt-4">
+              <ListItemAvatar className="flex-1">
+                <Avatar className="w-20 h-20" src={item.icon} alt={item.name} />
+              </ListItemAvatar>
+              <ListItemText className="flex-1" primary={item.name} />
+              <IconButton className="" onClick={() => handleEdit(item)}>
+                <FaEdit className="text-green-500"/>
+               
+              </IconButton>
+              {user === "admin" && (
+                <IconButton onClick={() => handleDelete(item)}>
+                  <FaTrash  className="text-red-600 ml-4"/>
+                </IconButton>
+              )}
+            </ListItem>
           ))}
-        </div>
+        </List>
       </div>
 
       <Dialog open={open} onClose={resetForm}>
@@ -232,17 +240,14 @@ const CreateCategory = ({user}) => {
           <Button onClick={resetForm} color="secondary">
             Close
           </Button>
-          {user ==='admin' && editMode ? (
+          {user === "admin" && editMode ? (
             <>
               <Button onClick={handleUpdate} color="info">
                 Update
               </Button>
-              
-
-              <Button onClick={handleDelete} color="error">
+              <Button onClick={() => handleDelete(selectedCategory)} color="error">
                 Delete
               </Button>
-
             </>
           ) : (
             <Button onClick={handleSubmit} color="primary">
@@ -257,4 +262,4 @@ const CreateCategory = ({user}) => {
   );
 };
 
-export default CreateCategory;
+export default React.memo(CreateCategory);

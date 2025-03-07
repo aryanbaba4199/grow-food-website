@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import ProductCard from "./productCard";
 import { IoIosArrowForward } from "react-icons/io";
 import Banner from "./banner";
@@ -10,6 +10,8 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 import { useSelector } from "react-redux";
+import UserContext from "@/userContext";
+
 
 
 const Home = () => {
@@ -23,12 +25,15 @@ const Home = () => {
   const products = useSelector((state) => state.products.products);
   const brands = useSelector((state) => state.products.brands);
   const categories = useSelector((state) => state.products.categories);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     if (products?.length) {
       setLoading(false);
     }
   }, [products, brands, categories]);
+
+ 
 
   const handleBrandFilter = (brand) => {
     const brandView = products.filter((product) => product.brand === brand);

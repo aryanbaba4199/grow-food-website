@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   TextField,
   Button,
@@ -7,6 +7,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  IconButton,
+  Avatar,
 } from "@mui/material";
 import axios from "axios";
 import Loader from "../helpers/loader";
@@ -14,7 +20,6 @@ import {
   API_URL,
   deleteBrandbyId,
   updateBrandbyId,
-  updateOrderbyId,
 } from "@/Api";
 import { useDispatch, useSelector } from "react-redux";
 import { getBrands } from "@/Redux/actions/productActions";
@@ -22,10 +27,10 @@ import deleteImageFromCloudinary, {
   uploadImageToCloudinary,
 } from "@/Context/functions";
 import Swal from "sweetalert2";
-import { FaPlus } from "react-icons/fa";
-import { decryptData } from "@/Context/userFunction";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { FaDeleteLeft } from "react-icons/fa6";
 
-const CreateBrand = ({user}) => {
+const CreateBrand = ({ user }) => {
   const [brandName, setBrandName] = useState("");
   const [icon, setIcon] = useState(null);
   const [iconURL, setIconURL] = useState("");
@@ -46,7 +51,7 @@ const CreateBrand = ({user}) => {
   useEffect(() => {
     if (iconURL !== "" && !editMode) {
       handleSubmit();
-    }else if(iconURL !=="" && editMode){
+    } else if (iconURL !== "" && editMode) {
       handleUpdate();
     }
   }, [iconURL]);
@@ -55,7 +60,6 @@ const CreateBrand = ({user}) => {
     setLoader(true);
     try {
       const clRes = await uploadImageToCloudinary(icon);
-      
       setIconURL(clRes.data.url);
       setImageId(clRes.data.public_id);
     } catch (e) {
@@ -84,7 +88,7 @@ const CreateBrand = ({user}) => {
           text: "Brand created successfully...",
         });
         resetForm();
-        dispatch(getBrands()); // Refresh the brands list
+        dispatch(getBrands());
       }
     } catch (err) {
       console.error("Error creating brand", err);
@@ -116,11 +120,11 @@ const CreateBrand = ({user}) => {
     setOpen(true);
   };
 
-  const handleDelete = async () => {
-    if (!selectedBrand) return;
+  const handleDelete = async (brand) => {
+    if (!brand) return;
     setLoader(true);
     try {
-      const res = await axios.delete(`${deleteBrandbyId}/${selectedBrand._id}`);
+      const res = await axios.delete(`${deleteBrandbyId}/${brand._id}`);
       if (res.status === 200) {
         Swal.fire({
           title: "Success",
@@ -153,48 +157,41 @@ const CreateBrand = ({user}) => {
   };
 
   const handleUpdate = async () => {
-    if(user!=='admin'){
-      return;
-    }
+    
     if (!selectedBrand) return;
     setLoader(true);
-    
-    
-      try {
-        console.log('upload', updateBrandbyId)
-        const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
-          name: brandName.toLowerCase(),
-          icon: iconURL ? iconURL : selectedBrand.icon,
+
+    try {
+      const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
+        name: brandName.toLowerCase(),
+        icon: iconURL ? iconURL : selectedBrand.icon,
+      });
+
+      if (res.status === 200) {
+        Swal.fire({
+          title: "Success",
+          icon: "success",
+          text: "Brand updated successfully",
         });
-        
-  
-        if (res.status === 200) {
-          Swal.fire({
-            title: "Success",
-            icon: "success",
-            text: "Brand updated successfully",
-          });
-          dispatch(getBrands());
-          handleClose();
-        } else {
-          Swal.fire({
-            title: "Failed",
-            icon: "error",
-            text: "Brand not found",
-          });
-        }
-      } catch (err) {
-        console.error("Error updating brand", err);
+        dispatch(getBrands());
+        handleClose();
+      } else {
         Swal.fire({
           title: "Failed",
           icon: "error",
-          text: "Bad Response",
+          text: "Brand not found",
         });
-      } finally {
-        setLoader(false);
       }
-   
-    
+    } catch (err) {
+      console.error("Error updating brand", err);
+      Swal.fire({
+        title: "Failed",
+        icon: "error",
+        text: "Bad Response",
+      });
+    } finally {
+      setLoader(false);
+    }
   };
 
   const resetForm = () => {
@@ -206,53 +203,59 @@ const CreateBrand = ({user}) => {
     setTempIconURL("");
   };
 
-  const handleUpdateClick = ()=>{
-    if(icon){
+  const handleUpdateClick = () => {
+    if (icon) {
       handleImageUpload();
-    }else{
+    } else {
       handleUpdate();
     }
-  }
+  };
 
   return (
     <div>
       <div className="px-8">
         <Typography
           variant="h4"
-          className="mb-4 mt-4 flex justify-center items-center "
+          className="mb-4 mt-4 flex justify-center items-center"
         >
-          <p className="flex bg-color-1 rounded-sm">
-            <span className="rounded-s-md bg-color-1 h-10 px-4">Brands</span>
+          <p className="flex  rounded-sm w-full  items-center">
+            <span className="w-[70%] text-center mb-8 h-10 px-4">Brands</span>
+            <button onClick={() => setOpen(true)} className="flex text-[24px] bg-green-200 px-4 py-1 rounded-lg gap-4">
+              Add Brand
             <FaPlus
-              onClick={() => setOpen(true)}
+              
               className="mx-2 my-1 hover:cursor-pointer bg-white text-green-700 rounded-full"
             />
+            </button>
           </p>
         </Typography>
-        <div className="flex flex-wrap gap-4 items-center mt-8 justify-between">
-          {brands.map((item, index) => (
-            <>
-              <div
-                key={index}
-                className="h-28 flex-1 border shadow-md shadow-black flex flex-col justify-center items-center cursor-pointer"
-                onClick={() => handleEdit(item)}
-              >
-                <img
-                  src={
-                    item?.icon ||
-                    "https://media.designrush.com/inspiration_images/134802/conversions/_1511456315_653_apple-desktop.jpg"
-                  }
-                  className="w-24 h-20 rounded-lg"
-                />
-                <span className="bg-color-1 w-full text-center px-4 mt-2">
-                  {item.name}
-                </span>
-              </div>
-            </>
+        <List className="flex justify-between items-center border-b">
+          <ListItem className="flex-1 font-bold">Image</ListItem>
+          <ListItem className="flex-1 font-bold">Name</ListItem>
+          <ListItem className="flex-1 font-bold justify-center">Action</ListItem>
+
+        </List>
+        <List className="">
+          {brands.map((item) => (
+            <ListItem key={item._id} className="border-b flex justify-between mt-4">
+              <ListItemAvatar className="flex-1">
+                <Avatar className="w-20 h-20" src={item.icon} alt={item.name} />
+              </ListItemAvatar>
+              <ListItemText primary={item.name} className="flex-1"/>
+              <IconButton className=" gap-16" >
+                <FaEdit onClick={() => handleEdit(item)} className="text-start text-green-600"/>
+                
+              </IconButton>
+              {user === 'admin' && (
+                <IconButton onClick={() => handleDelete(item)}>
+                  <FaTrash className="text-red-600 ml-4"/>
+                </IconButton>
+              )}
+            </ListItem>
           ))}
-        </div>
+        </List>
       </div>
-      
+
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{editMode ? "Edit Brand" : "Create Brand"}</DialogTitle>
         <DialogContent>
@@ -282,16 +285,16 @@ const CreateBrand = ({user}) => {
               <Button onClick={handleUpdateClick} color="primary">
                 Update
               </Button>
-              {user==='admin' &&
+              {user === 'admin' && (
                 <Button
                   onClick={() => {
-                    handleDelete();
+                    handleDelete(selectedBrand);
                   }}
                   color="error"
                 >
                   Delete
                 </Button>
-              }
+              )}
             </>
           ) : (
             <Button onClick={handleImageUpload} color="primary">
@@ -306,4 +309,4 @@ const CreateBrand = ({user}) => {
   );
 };
 
-export default CreateBrand;
+export default React.memo(CreateBrand);

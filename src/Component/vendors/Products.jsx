@@ -34,7 +34,7 @@ const Products = () => {
   const getVendorProducts = async () => {
     try {
       const res = await getterFunction(
-        `${vendorApi.products}/${user._id}?page=${currentPage}`
+        `${vendorApi.products}/${user._id}/page=${currentPage}`
       );
       setProducts(res.products);
       setTotalPages(res.totalPages);

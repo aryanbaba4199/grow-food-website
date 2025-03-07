@@ -97,7 +97,7 @@ const Header = () => {
               <div className="md:flex hidden gap-2 w-[50%]">
                 <div className="flex justify-between items-center gap-4 w-full mr-40">
                   {sideBarData.map((item, index) => (
-                    <div className="w-full flex ">
+                    <div key={index} className="w-full flex ">
                       {!showDashboard && (
                         <Link
                           className="flex-1 bg-green-100 text-green-950 font-semibold  w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"

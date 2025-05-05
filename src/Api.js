@@ -1,8 +1,8 @@
 import axios from "axios";
 
 
-const apiurl = 'http://localhost:5000'
-//  const apiurl = 'https://growfoodapi-1032443967847.asia-south1.run.app'
+// const apiurl = 'http://localhost:5000'
+ const apiurl = 'https://growfoodapi-1032443967847.asia-south1.run.app'
 
 export const API_URL = apiurl;
 export const logo_uri = 'https://i.pinimg.com/736x/5d/90/4b/5d904b9f3b2f1a21c7ef3d19729598a3.jpg'

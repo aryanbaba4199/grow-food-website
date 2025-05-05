@@ -203,7 +203,7 @@ const Sliders = () => {
               type="text"
               name="image"
               placeholder="Image URL"
-              value={editSlide.image}
+              value={editSlide?.image}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-3"
             />
@@ -211,7 +211,7 @@ const Sliders = () => {
               type="text"
               name="title"
               placeholder="Title"
-              value={editSlide.title}
+              value={editSlide?.title}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-3"
             />
@@ -219,7 +219,7 @@ const Sliders = () => {
               type="text"
               name="sliderType"
               placeholder="Slider Type"
-              value={editSlide.sliderType}
+              value={editSlide?.sliderType}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-3"
             />
@@ -227,7 +227,7 @@ const Sliders = () => {
               type="text"
               name="id"
               placeholder="ID"
-              value={editSlide.id}
+              value={editSlide?.id}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-3"
             />
@@ -235,7 +235,7 @@ const Sliders = () => {
               type="number"
               name="rank"
               placeholder="Rank"
-              value={editSlide.rank}
+              value={editSlide?.rank}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md mb-3"
             />

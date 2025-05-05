@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { encryptData, decryptData } from "./userFunction";
 
+
 export const memoize = async (fn, name) => {
   const cachedData = localStorage.getItem(name);
   if (cachedData) {
@@ -26,9 +27,9 @@ export const memoize = async (fn, name) => {
   return result;
 };
 
-export const getProducts = async () => {
+export const getProducts = async (page, address) => {
   try {
-    const res = await axios.get(getProductsApi);
+    const res = await axios.get(`getProductsApi/page=${page}/address=${address}`);
     if (res.status === 200) {
       localStorage.setItem('products', encryptData(res.data));
       return { data: res.data, response: true };

@@ -2,49 +2,45 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Authform from "@/Component/user/authform";
-import { authApi, forgotPasswordApi, posterFunction, getterFunction, registerApi, userlogin } from "@/Api";
-import { logout } from "@/Redux/actions/userAuthAction";
+import { authApi, forgotPasswordApi, posterFunction, registerApi, userlogin } from "@/Api";
 import Swal from "sweetalert2";
 import UserContext from "@/userContext";
 import Loader from "@/Component/helpers/loader";
-import { useDispatch } from "react-redux";
 import Head from "next/head";
 import LoginPoster from "@/Component/helpers/LoginPoster";
 
+const FORM_INITIAL_STATE = {
+  email: "",
+  password: "",
+  name: "",
+  mobile: "",
+  shopName: "",
+  gst: "",
+  shopAddress: "",
+  userType: "NA",
+  state: "",
+  city: "",
+  radius: 0,
+  distributionAreas: [],
+};
+
 const Page = () => {
   const [authType, setAuthType] = useState("SignIn");
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: "",
-    mobile: "",
-    shopName: "",
-    gst: "",
-    shopAddress: "",
-    userType: "NA",
-    state : "",
-    city: "",
-    distributionAreas: [],
-  });
+  const [formData, setFormData] = useState(FORM_INITIAL_STATE);
   const [loader, setLoader] = useState(false);
   const [open, setOpen] = useState(false);
   const [otp, setOtp] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { user, setUser, setToken, token } = useContext(UserContext);
+  const { setUser, setToken, token } = useContext(UserContext);
   const router = useRouter();
-  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (token) {
-      router.push("/");
-    }
-  }, [token]);
+    if (token) router.push("/");
+  }, [token, router]);
 
-  const handleAuthSwitch = () => {
-    setAuthType(authType === "SignIn" ? "SignUp" : "SignIn");
-  };
+  const handleAuthSwitch = () => setAuthType(authType === "SignIn" ? "SignUp" : "SignIn");
 
   const handleVerifyOtp = async () => {
     try {
@@ -59,7 +55,7 @@ const Page = () => {
 
   const handleResetPassword = async () => {
     if (newPassword !== confirmPassword) {
-      Swal.fire({ title: "Error", text: "Password mismatch", icon: "error" });
+      Swal.fire({ title: "Error", text: "Passwords do not match", icon: "error" });
       return;
     }
     try {
@@ -74,53 +70,40 @@ const Page = () => {
   };
 
   const handleSubmit = async () => {
-
     setLoader(true);
-    if (authType === "forgot") {
-      if (!formData.email) {
-        Swal.fire({ title: "Warning", text: "Email is required", icon: "warning" });
-        setLoader(false);
-        return;
-      }
-      try {
-        const res = await getterFunction(`${forgotPasswordApi}/${formData.email}`);
+    try {
+      if (authType === "forgot") {
+        if (!formData.email) {
+          Swal.fire({ title: "Warning", text: "Email is required", icon: "warning" });
+          return;
+        }
+        const res = await posterFunction(`${forgotPasswordApi}/${formData.email}`);
         setOpen(true);
         Swal.fire({ title: "Success", text: res.message, icon: "success" });
-      } catch (e) {
-        Swal.fire({ title: "Failure", text: e.message, icon: "error" });
-      } finally {
-        setLoader(false);
+        return;
       }
-      return;
-    }
 
-    if (authType === "SignIn") {
-      try {
-        const response = await posterFunction(userlogin, { email: formData.email, password: formData.password });
+      if (authType === "SignIn") {
+        const response = await posterFunction(userlogin, {
+          email: formData.email,
+          password: formData.password,
+        });
         const { token, user } = response;
         setToken(token);
         setUser(user);
         localStorage.setItem("gfuser", JSON.stringify(user));
-        localStorage.setItem("gfToken", token);
+        localStorage.setItem("gfToken", JSON.stringify(token));
         router.push("/");
         Swal.fire({ title: "Success", text: "Logged in successfully", icon: "success" });
-      } catch (error) {
-        Swal.fire({ title: "Error", text: error.message, icon: "error" });
-      } finally {
-        setLoader(false);
-      }
-    } else if (authType === "SignUp") {
-      try {
+      } else if (authType === "SignUp") {
         const res = await posterFunction(registerApi, formData);
-        
-          Swal.fire({ title: "Success", text: "Thanks for joining Grow Food", icon: "success" });
-          setAuthType("SignIn");
-        
-      } catch (error) {
-        Swal.fire({ title: "Failure", text: error.message, icon: "error" });
-      } finally {
-        setLoader(false);
+        Swal.fire({ title: "Success", text: "Thanks for joining Grow Food", icon: "success" });
+        setAuthType("SignIn");
       }
+    } catch (error) {
+      Swal.fire({ title: "Error", text: error.message, icon: "error" });
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -134,14 +117,18 @@ const Page = () => {
       {loader ? (
         <Loader />
       ) : (
-        <div className="flex min-h-screen bg-gray-100">
-          <div className="w-[70%] p-8 flex justify-center items-center">
+        <div className="flex min-h-screen bg-gray-50">
+          <div className="hidden md:flex md:w-2/3 p-8 justify-center items-center bg-gradient-to-r from-green-100 to-yellow-100">
             <LoginPoster />
           </div>
-          <div className="mt-8 w-[30%] bg-white rounded-lg shadow-lg min-h-screen p-6">
-            <div className="flex flex-col justify-center items-center">
-              <img src="/favicon.ico" alt="Grow Food" className="w-32 h-32 border-4 border-yellow-400 shadow-lg rounded-full p-4" />
-              <h2 className="text-3xl font-semibold text-yellow-600 mt-6 mb-4">
+          <div className="w-full md:w-1/3 bg-white shadow-xl rounded-lg min-h-screen p-6 flex flex-col justify-center">
+            <div className="flex flex-col items-center mb-6">
+              <img
+                src="/favicon.ico"
+                alt="Grow Food"
+                className="w-24 h-24 border-4 border-yellow-400 rounded-full p-2 shadow-md"
+              />
+              <h2 className="text-2xl font-bold text-green-600 mt-4">
                 {authType === "SignIn" ? "Sign In" : "Create Account"}
               </h2>
             </div>

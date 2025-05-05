@@ -100,7 +100,7 @@ const Header = () => {
                     <div key={index} className="w-full flex ">
                       {!showDashboard && (
                         <Link
-                          className="flex-1 bg-green-100 text-green-950 font-semibold  w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
+                          className="flex-1 border-green-600 bg-white-100 text-green-950 font-semibold  w-20 rounded-md hover:bg-green-800 hover:text-white text-center p-1"
                           href={`${item.path}`}
                         >
                           {item.name}

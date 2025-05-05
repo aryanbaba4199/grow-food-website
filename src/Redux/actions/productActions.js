@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { categoryApi, getBrandsApi, getBrandsProductApi, getCategoriesApi, getCategoriesProductApi, getSubCategoriesApi, getSubCategoriesAPI, getUnitApi, productsAPi } from '@/Api';
+import { categoryApi, DeleteApi, getBrandsApi, getBrandsProductApi, getCategoriesApi, getCategoriesProductApi, getSubCategoriesApi, getSubCategoriesAPI, getterFunction, getUnitApi, posterFunction, productsAPi, updaterFunction } from '@/Api';
 export const GET_PRODUCTS = 'GET_PRODUCTS';
 export const ADD_PRODUCT = 'ADD_PRODUCT';
 export const GET_PRODUCT = 'GET_PRODUCT';
@@ -29,7 +29,7 @@ export const getProducts = (page) => async dispatch => {
 
 export const getProduct = (id) => async (dispatch) => {
   try {
-    const res = await axios.get(`${API_URL}/product/${id}`);
+    const res = await getterFunction(`${API_URL}/product/${id}`);
     dispatch({ type: GET_PRODUCT, payload: res.data });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -38,7 +38,7 @@ export const getProduct = (id) => async (dispatch) => {
 
 export const getBrandsProduct = (brand)=> async(dispatch)=>{
   try{
-    const res = await axios.get(`${getBrandsProductApi}/${brand}`)
+    const res = await getterFunction(`${getBrandsProductApi}/${brand}`)
     dispatch({type : 'GET_BRANDS_PRODUCT', payload: res.data});
   }catch(err){
     console.error('Error fetching brands product', err);
@@ -47,7 +47,7 @@ export const getBrandsProduct = (brand)=> async(dispatch)=>{
 
 export const getCategoriesProduct = (categories)=> async(dispatch)=>{
   try{
-    const res = await axios.get(`${getCategoriesProductApi}/${categories}`)
+    const res = await getterFunction(`${getCategoriesProductApi}/${categories}`)
     dispatch({type : 'GET_CATEGORY_PRODUCT', payload: res.data});
   }catch(err){
     console.error('Error fetching brands product', err);
@@ -59,7 +59,7 @@ export const getCategoriesProduct = (categories)=> async(dispatch)=>{
 export const getBrands = () => async dispatch => {
   try{
   let brand = "brands";
-  const response = await axios.get(getBrandsApi);
+  const response = await getterFunction(getBrandsApi);
   dispatch({type : GET_BRANDS, payload: response.data})
   }catch (error) {
     console.error('Error fetching Brands', error);
@@ -72,7 +72,7 @@ export const getBrands = () => async dispatch => {
 export const getCategories = () => async dispatch => {
   try{
     let category = "category";
-    const response = await axios.get(categoryApi);
+    const response = await getterFunction(categoryApi);
     dispatch({type : GET_CATEGORY, payload: response.data})
   }catch(err){
     console.error('Error fetching categories', err);
@@ -81,7 +81,7 @@ export const getCategories = () => async dispatch => {
 
 export const getUnit = ()=>async dispatch =>{
   try{
-    const res = await axios.get(getUnitApi);
+    const res = await getterFunction(getUnitApi);
     dispatch({type : GET_UNIT, payload: res.data});
   }catch(err){
     console.error('Error fetching unit', err);
@@ -92,7 +92,7 @@ export const getUnit = ()=>async dispatch =>{
 
 export const getSubCategories = ()=>async dispatch =>{
   try{
-    const res = await axios.get(getSubCategoriesApi);
+    const res = await getterFunction(getSubCategoriesApi);
     dispatch({type : GET_SUBCATEGORY, payload: res.data})
   }catch(err){
     console.error('Error fetching', err);
@@ -104,11 +104,7 @@ export const getSubCategories = ()=>async dispatch =>{
 
 export const addProduct = (productData) => async dispatch => {
   try {
-    const response = await axios.post(API_URL, productData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await posterFunction(API_URL, productData);
     dispatch({ type: ADD_PRODUCT, payload: response.data });
   } catch (error) {
     console.error('Error adding product:', error);
@@ -119,7 +115,7 @@ export const addProduct = (productData) => async dispatch => {
 
 export const updateProduct = (id, product) => async dispatch => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, product);
+    const response = await updaterFunction(`${API_URL}/${id}`, product);
     dispatch({ type: UPDATE_PRODUCT, payload: response.data });
   } catch (error) {
     console.error('Error updating product:', error);
@@ -128,7 +124,7 @@ export const updateProduct = (id, product) => async dispatch => {
 
 export const deleteProduct = id => async dispatch => {
   try {
-    await axios.delete(`${API_URL}/${id}`);
+    await DeleteApi(`${API_URL}/${id}`);
     dispatch({ type: DELETE_PRODUCT, payload: id });
   } catch (error) {
     console.error('Error deleting product:', error);

@@ -1,16 +1,24 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { getterFunction, getUserApi, getOrderApi } from "@/Api";
 
-const Page = () => {
+const InvoicePage = () => {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <PageContent />
+    </Suspense>
+  );
+};
+
+const PageContent = () => {
   const searchParams = useSearchParams();
   const oid = searchParams.get("oid");
   const uid = searchParams.get("uid");
-  
+
   const [user, setUser] = useState(null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -127,4 +135,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default InvoicePage;

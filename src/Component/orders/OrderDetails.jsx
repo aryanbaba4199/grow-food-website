@@ -68,7 +68,7 @@ const OrderDetails = ({ id, setOpen }) => {
     );
   }
 
-  console.log(order);
+  
 
   return (
     <>

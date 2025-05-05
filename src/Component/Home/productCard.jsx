@@ -64,6 +64,7 @@ const ProductCard = ({ item, index }) => {
           text: "Product added to cart successfully",
           icon: "success",
         });
+        
       }
     }catch(e){
       Swal.fire({

@@ -19,7 +19,9 @@ import Loader from "../helpers/loader";
 import {
   API_URL,
   deleteBrandbyId,
+  posterFunction,
   updateBrandbyId,
+  updaterFunction,
 } from "@/Api";
 import { useDispatch, useSelector } from "react-redux";
 import { getBrands } from "@/Redux/actions/productActions";
@@ -76,7 +78,7 @@ const CreateBrand = ({ user }) => {
   const handleSubmit = async () => {
     setLoader(true);
     try {
-      const res = await axios.post(`${API_URL}/api/products/createBrand`, {
+      const res = await posterFunction(`${API_URL}/api/products/createBrand`, {
         name: brandName.toLowerCase(),
         icon: iconURL,
       });
@@ -162,7 +164,7 @@ const CreateBrand = ({ user }) => {
     setLoader(true);
 
     try {
-      const res = await axios.put(`${updateBrandbyId}/${selectedBrand._id}`, {
+      const res = await updaterFunction(`${updateBrandbyId}/${selectedBrand._id}`, {
         name: brandName.toLowerCase(),
         icon: iconURL ? iconURL : selectedBrand.icon,
       });
@@ -236,7 +238,7 @@ const CreateBrand = ({ user }) => {
 
         </List>
         <List className="">
-          {brands.map((item) => (
+          {brands?.length>0 && brands.map((item) => (
             <ListItem key={item._id} className="border-b flex justify-between mt-4">
               <ListItemAvatar className="flex-1">
                 <Avatar className="w-20 h-20" src={item.icon} alt={item.name} />

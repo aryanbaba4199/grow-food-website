@@ -17,7 +17,7 @@ export const GET_BRANDS_PRODUCT = 'GET_BRANDS_PRODUCT';
 // Use the correct URL for React Native emulator
 const API_URL = productsAPi;
 
-export const getProducts = (page) => async dispatch => {
+export const getProducts = (page, address) => async dispatch => {
   try {
     const response = await axios.get(`${API_URL}/${page??1}`);
     dispatch({ type: GET_PRODUCTS, payload: response.data});

@@ -96,6 +96,7 @@ const Page = () => {
         router.push("/");
         Swal.fire({ title: "Success", text: "Logged in successfully", icon: "success" });
       } else if (authType === "SignUp") {
+       
         const res = await posterFunction(registerApi, formData);
         Swal.fire({ title: "Success", text: "Thanks for joining Grow Food", icon: "success" });
         setAuthType("SignIn");

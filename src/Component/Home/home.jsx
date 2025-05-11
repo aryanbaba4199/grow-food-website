@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import UserContext from "@/userContext";
+import { getProduct } from "@/Redux/actions/productActions";
 
 
 
@@ -21,17 +22,17 @@ const Home = () => {
 
   const router = useRouter();
   const productContainerRef = useRef(null);
-
+  const dispatch = useDispatch()
   const products = useSelector((state) => state.products.products);
   const brands = useSelector((state) => state.products.brands);
   const categories = useSelector((state) => state.products.categories);
   const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    if (products?.length) {
-      setLoading(false);
-    }
-  }, [products, brands, categories]);
+
+
+  // useEffect(() => {
+  //   dispatch(getProduct(1, ))
+  // }, [dispatch]);
 
  
 
@@ -55,7 +56,7 @@ const Home = () => {
 
   return (
     <>
-      {products.length === 0 ? (
+      {loading ? (
         <Loader />
       ) : (
         <div className=" px-4 w-full md:mt-0 mt-14">

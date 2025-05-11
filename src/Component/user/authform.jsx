@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { TextField, Button, Autocomplete, Typography } from "@mui/material";
-import { useJsApiLoader, Autocomplete as GoogleSuggestion } from "@react-google-maps/api";
+import {
+  useJsApiLoader,
+  Autocomplete as GoogleSuggestion,
+} from "@react-google-maps/api";
 
 const libraries = ["places"];
 
@@ -45,7 +48,7 @@ const Authform = ({
 }) => {
   const autocompleteRef = useRef(null);
   const shouldLoadMap = authType === "SignUp";
-  
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAi2MQyWnPyrSAY_jny04NPMKWoXZH5M1c",
     libraries,
@@ -81,7 +84,11 @@ const Authform = ({
 
   return (
     <div className="max-w-md mx-auto p-4">
-      <Typography variant="h5" align="center" className="mb-6 text-green-600 font-bold">
+      <Typography
+        variant="h5"
+        align="center"
+        className="mb-6 text-green-600 font-bold"
+      >
         The Grow Food
       </Typography>
 
@@ -94,34 +101,56 @@ const Authform = ({
                 fullWidth
                 margin="normal"
                 value={formData.shopName}
-                onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, shopName: e.target.value })
+                }
               />
               <TextField
                 label="Contact Person Name"
                 fullWidth
                 margin="normal"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
               <TextField
-                label="Mobile"
+                label="Mobile ( +91 ) "
                 fullWidth
                 margin="normal"
+                placeholder="Enter 10 digit mobile number"
                 type="tel"
                 value={formData.mobile}
-                onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                inputProps={{
+                  inputMode: "numeric", // mobile numeric keyboard
+                  pattern: "[0-9]*", // enforce digits only
+                  maxLength: 10, // optional: limit to 10 digits
+                }}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d*$/.test(val)) {
+                    // allow only digits
+                    setFormData({ ...formData, mobile: val });
+                  }
+                }}
               />
+
               {isLoaded && (
                 <GoogleSuggestion
                   onLoad={(autocomplete) => {
                     autocompleteRef.current = autocomplete;
                     autocomplete.setOptions(autocompleteOptions);
-                  
-                    if (formData.shopAddress?.lat && formData.shopAddress?.lng) {
+
+                    if (
+                      formData.shopAddress?.lat &&
+                      formData.shopAddress?.lng
+                    ) {
                       autocomplete.setBounds(
                         new window.google.maps.Circle({
-                          center: { lat: formData.shopAddress.lat, lng: formData.shopAddress.lng },
-                        
+                          center: {
+                            lat: formData.shopAddress.lat,
+                            lng: formData.shopAddress.lng,
+                          },
                         }).getBounds()
                       );
                     }
@@ -139,9 +168,16 @@ const Authform = ({
               <Autocomplete
                 options={["Restaurant", "Vendor"]}
                 value={formData.userType}
-                onChange={(e, newValue) => setFormData({ ...formData, userType: newValue })}
+                onChange={(e, newValue) =>
+                  setFormData({ ...formData, userType: newValue })
+                }
                 renderInput={(params) => (
-                  <TextField {...params} label="User Type" fullWidth margin="normal" />
+                  <TextField
+                    {...params}
+                    label="User Type"
+                    fullWidth
+                    margin="normal"
+                  />
                 )}
               />
               {formData.userType === "Vendor" && (
@@ -151,14 +187,18 @@ const Authform = ({
                     fullWidth
                     margin="normal"
                     value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, state: e.target.value })
+                    }
                   />
                   <TextField
                     label="City"
                     fullWidth
                     margin="normal"
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
                   />
                   <TextField
                     label="Radius (KM)"
@@ -166,7 +206,9 @@ const Authform = ({
                     margin="normal"
                     type="number"
                     value={formData.radius}
-                    onChange={(e) => setFormData({ ...formData, radius: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, radius: e.target.value })
+                    }
                   />
                 </>
               )}
@@ -175,7 +217,9 @@ const Authform = ({
                 fullWidth
                 margin="normal"
                 value={formData.gst}
-                onChange={(e) => setFormData({ ...formData, gst: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, gst: e.target.value })
+                }
               />
             </>
           )}
@@ -184,7 +228,9 @@ const Authform = ({
             fullWidth
             margin="normal"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             type="email"
           />
           {(authType === "SignUp" || authType === "SignIn") && (
@@ -193,7 +239,9 @@ const Authform = ({
               fullWidth
               margin="normal"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
               type="password"
             />
           )}
@@ -212,13 +260,20 @@ const Authform = ({
               onClick={handleSubmit}
               className="bg-green-600 hover:bg-green-700"
             >
-              {authType === "SignIn" ? "Sign In" : authType === "SignUp" ? "Create Account" : "Send Email"}
+              {authType === "SignIn"
+                ? "Sign In"
+                : authType === "SignUp"
+                ? "Create Account"
+                : "Send Email"}
             </Button>
           </div>
         </>
       ) : (
         <div className="flex flex-col items-center">
-          <Typography variant="subtitle1" className="my-4 text-gray-700 font-semibold">
+          <Typography
+            variant="subtitle1"
+            className="my-4 text-gray-700 font-semibold"
+          >
             Enter OTP (Check your email)
           </Typography>
           <TextField

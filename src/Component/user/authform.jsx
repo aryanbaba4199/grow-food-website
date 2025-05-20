@@ -1,9 +1,16 @@
-import React, { useEffect, useRef } from "react";
-import { TextField, Button, Autocomplete, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import {
+  TextField,
+  Button,
+  Autocomplete,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import {
   useJsApiLoader,
   Autocomplete as GoogleSuggestion,
 } from "@react-google-maps/api";
+import debounce from "lodash.debounce";
 
 const libraries = ["places"];
 
@@ -48,12 +55,106 @@ const Authform = ({
 }) => {
   const autocompleteRef = useRef(null);
   const shouldLoadMap = authType === "SignUp";
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [addressInput, setAddressInput] = useState("");
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAi2MQyWnPyrSAY_jny04NPMKWoXZH5M1c",
     libraries,
   });
 
+  // Debounced function to fetch location suggestions
+  const fetchSuggestions = useCallback(
+    debounce(async (input) => {
+      if (!input || !input.includes(" ")) return;
+      setIsLoadingSuggestions(true);
+      try {
+        const response = await fetch(
+          `https://education-1064837086369.asia-south1.run.app/college/suggestLocation?input=${encodeURIComponent(
+            input
+          )}&type=establishment`
+        );
+        const data = await response.json();
+        setSuggestions(data.predictions || []);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    }, 500),
+    []
+  );
+
+  // Forward geocoding with OpenCage
+  const forwardGeocode = async (inputAddress) => {
+    try {
+      const API_KEY = "97b4515e61ee4bf4bf8822d16b2cc839"; // Replace with your OpenCage API Key
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+          inputAddress
+        )}&key=${API_KEY}`
+      );
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry;
+        setFormData((prev) => ({
+          ...prev,
+          shopAddress: {
+            formattedAddress: inputAddress,
+            lat,
+            lng,
+          },
+        }));
+        return true;
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          shopAddress: {
+            formattedAddress: inputAddress,
+            lat: 0,
+            lng: 0,
+          },
+        }));
+        alert("Invalid address. Please provide a more specific address.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error during forward geocoding:", error);
+      setFormData((prev) => ({
+        ...prev,
+        shopAddress: {
+          formattedAddress: inputAddress,
+          lat: 0,
+          lng: 0,
+        },
+      }));
+      alert("Error validating address. Please try again.");
+      return false;
+    }
+  };
+
+  // Handle address input change
+  const handleAddressChange = (event, newInputValue) => {
+    setAddressInput(newInputValue);
+    if (newInputValue.includes(" ")) {
+      fetchSuggestions(newInputValue);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  // Handle suggestion selection
+  const handleSuggestionSelect = async (event, newValue) => {
+    if (newValue) {
+      setAddressInput(newValue.description);
+      await forwardGeocode(newValue.description);
+      setSuggestions([]);
+    }
+  };
+
+  // Handle Google Places selection
   const handlePlaceChanged = () => {
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
@@ -66,6 +167,7 @@ const Authform = ({
             lng: place.geometry.location.lng(),
           },
         }));
+        setAddressInput(place.formatted_address);
         autocompleteRef.current.value = "";
       }
     }
@@ -122,48 +224,76 @@ const Authform = ({
                 type="tel"
                 value={formData.mobile}
                 inputProps={{
-                  inputMode: "numeric", // mobile numeric keyboard
-                  pattern: "[0-9]*", // enforce digits only
-                  maxLength: 10, // optional: limit to 10 digits
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                  maxLength: 10,
                 }}
                 onChange={(e) => {
                   const val = e.target.value;
                   if (/^\d*$/.test(val)) {
-                    // allow only digits
                     setFormData({ ...formData, mobile: val });
                   }
                 }}
               />
-
               {isLoaded && (
-                <GoogleSuggestion
-                  onLoad={(autocomplete) => {
-                    autocompleteRef.current = autocomplete;
-                    autocomplete.setOptions(autocompleteOptions);
-
-                    if (
-                      formData.shopAddress?.lat &&
-                      formData.shopAddress?.lng
-                    ) {
-                      autocomplete.setBounds(
-                        new window.google.maps.Circle({
-                          center: {
-                            lat: formData.shopAddress.lat,
-                            lng: formData.shopAddress.lng,
-                          },
-                        }).getBounds()
-                      );
+                <>
+                  <Autocomplete
+                    freeSolo
+                    options={suggestions}
+                    getOptionLabel={(option) =>
+                      typeof option === "string" ? option : option.description
                     }
-                  }}
-                  onPlaceChanged={handlePlaceChanged}
-                >
-                  <TextField
-                    label="Shop Address"
-                    fullWidth
-                    margin="normal"
-                    placeholder="Start typing an area (e.g., Saraiya)"
+                    onInputChange={handleAddressChange}
+                    onChange={handleSuggestionSelect}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Shop Address"
+                        fullWidth
+                        margin="normal"
+                        placeholder="Start typing an area (e.g., Saraiya)"
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {isLoadingSuggestions ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                        }}
+                      />
+                    )}
                   />
-                </GoogleSuggestion>
+                  <GoogleSuggestion
+                    onLoad={(autocomplete) => {
+                      autocompleteRef.current = autocomplete;
+                      autocomplete.setOptions(autocompleteOptions);
+                      if (
+                        formData.shopAddress?.lat &&
+                        formData.shopAddress?.lng
+                      ) {
+                        autocomplete.setBounds(
+                          new window.google.maps.Circle({
+                            center: {
+                              lat: formData.shopAddress.lat,
+                              lng: formData.shopAddress.lng,
+                            },
+                          }).getBounds()
+                        );
+                      }
+                    }}
+                    onPlaceChanged={handlePlaceChanged}
+                  >
+                    <TextField
+                      label="Search with Google Maps"
+                      fullWidth
+                      margin="normal"
+                      placeholder="Alternative: Search via Google Maps"
+                    />
+                  </GoogleSuggestion>
+                </>
               )}
               <Autocomplete
                 options={["Restaurant", "Vendor"]}

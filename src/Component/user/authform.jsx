@@ -266,7 +266,7 @@ const Authform = ({
                       />
                     )}
                   />
-                  <GoogleSuggestion
+                  {/* <GoogleSuggestion
                     onLoad={(autocomplete) => {
                       autocompleteRef.current = autocomplete;
                       autocomplete.setOptions(autocompleteOptions);
@@ -292,7 +292,7 @@ const Authform = ({
                       margin="normal"
                       placeholder="Alternative: Search via Google Maps"
                     />
-                  </GoogleSuggestion>
+                  </GoogleSuggestion> */}
                 </>
               )}
               <Autocomplete
